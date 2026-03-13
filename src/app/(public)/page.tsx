@@ -1,1203 +1,2515 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import {
-  Sparkles,
-  User,
-  Search,
-  Rocket,
-  Settings,
-  Star,
-  LayoutGrid,
-  DollarSign,
-  Link2,
-  Clock,
-  TrendingUp,
-  BarChart3,
-  MapPin,
-  Mail,
-  Phone,
-} from "lucide-react";
+import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
+import Image from "next/image";
+import { useState, useEffect } from "react";
 
-const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+type Review = {
+  text: string;
+  name: string;
+  company: string;
+  trade: string;
+};
 
-function useInView(offset = 50) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [isInView, setIsInView] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setIsInView(true);
-      },
-      { threshold: 0.1, rootMargin: `${offset}px` }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [offset]);
-
-  return { ref, isInView };
-}
-
-function useCountUp(end: number, isInView: boolean, duration = 2000) {
-  const [value, setValue] = useState(0);
-
-  useEffect(() => {
-    if (!isInView) return;
-    let startTime: number;
-    const step = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const elapsed = timestamp - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      setValue(Math.round(easeOut(progress) * end));
-      if (progress < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }, [end, isInView, duration]);
-
-  return value;
-}
-
-function useNavbarScroll() {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-  return scrolled;
-}
-
-const navLinks = [
-  { href: "#home", label: "Home" },
-  { href: "#features", label: "Features" },
-  { href: "#about", label: "About" },
-  { href: "#pricing", label: "Pricing" },
-  { href: "#", label: "Pages", dropdown: true },
-  { href: "#contact", label: "Contact" },
+const reviewsRow1: Review[] = [
+  {
+    text: "We went from a few calls a week to a steady stream of booked estimates.",
+    name: "Mark H.",
+    company: "Summit Roofing Co.",
+    trade: "Roofing",
+  },
+  {
+    text: "The AI follow up keeps our pipeline full while my crew focuses on installs.",
+    name: "Danielle R.",
+    company: "BrightView Kitchens",
+    trade: "Kitchen Remodeling",
+  },
+  {
+    text: "Every lead is exclusive and ready to talk about a real project.",
+    name: "Carlos M.",
+    company: "Prime Home Exteriors",
+    trade: "Siding",
+  },
+  {
+    text: "Best return on ad spend we have seen in ten years of running marketing.",
+    name: "Steve P.",
+    company: "Evergreen Windows",
+    trade: "Windows and Doors",
+  },
+  {
+    text: "Our calendar is booked out weeks in advance with qualified appointments.",
+    name: "Lauren K.",
+    company: "Northstar Bathrooms",
+    trade: "Bathroom Remodeling",
+  },
+  {
+    text: "Setup was simple and the team handles everything from ads to follow up.",
+    name: "Tom B.",
+    company: "Precision Painting",
+    trade: "Painting",
+  },
+  {
+    text: "We finally stopped chasing low quality shared leads from marketplaces.",
+    name: "James L.",
+    company: "Reliant Home Pros",
+    trade: "General Remodeling",
+  },
+  {
+    text: "The 30 day guarantee made it a no brainer and they delivered.",
+    name: "Amber C.",
+    company: "PureAir Comfort",
+    trade: "HVAC",
+  },
 ];
 
-export default function ZyvroLanding() {
-  const navbarScrolled = useNavbarScroll();
+const reviewsRow2: Review[] = [
+  {
+    text: "Shows up in our calendar as booked jobs instead of names on a spreadsheet.",
+    name: "Kevin D.",
+    company: "Metro Garage Makeovers",
+    trade: "Garage Remodeling",
+  },
+  {
+    text: "Our reps love that leads are already warmed up before the first call.",
+    name: "Rachel F.",
+    company: "Coastal Deck and Patio",
+    trade: "Decks",
+  },
+  {
+    text: "We cut our no show rate way down by using their reminders and follow up.",
+    name: "Mike G.",
+    company: "ClearView Glass",
+    trade: "Windows and Glass",
+  },
+  {
+    text: "They manage the tech so we can stay focused on installs and production.",
+    name: "Olivia S.",
+    company: "Sunrise Solar Roofs",
+    trade: "Solar and Roofing",
+  },
+  {
+    text: "Our cost per booked appointment dropped and close rates went up.",
+    name: "Brian T.",
+    company: "Solid Stone Countertops",
+    trade: "Countertops",
+  },
+  {
+    text: "The team actually understands home improvement and how homeowners buy.",
+    name: "Sophie W.",
+    company: "BlueRiver Remodeling",
+    trade: "Remodeling",
+  },
+  {
+    text: "Exclusive leads only and they hit the results they promised.",
+    name: "Ethan R.",
+    company: "Peak Performance Roofing",
+    trade: "Roofing",
+  },
+  {
+    text: "We went from hoping for calls to knowing what our next thirty days look like.",
+    name: "Hannah J.",
+    company: "GreenLeaf Exteriors",
+    trade: "Exterior Remodeling",
+  },
+];
+
+export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const heroInView = useInView(0);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.location.hash === "#how-it-works") {
+      const el = document.getElementById("how-it-works");
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }
+  }, []);
 
   return (
-    <div className="min-h-screen bg-[#000000]">
-      {/* ========== NAVBAR ========== */}
-      <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-          navbarScrolled
-            ? "bg-black/80 backdrop-blur-xl border-b border-white/10"
-            : "bg-transparent"
-        }`}
-        style={{
-          animation: "navbarSlide 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-        }}
-      >
-        <style jsx>{`
-          @keyframes navbarSlide {
-            from {
-              transform: translateY(-100%);
-            }
-            to {
-              transform: translateY(0);
-            }
-          }
-        `}</style>
-        <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-8">
-          <a href="#home" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded bg-[#3B6EF8] font-syne text-lg font-bold text-white">
-              Z
-            </div>
-            <span className="font-syne text-xl font-bold text-white">
-              Zyvro
-            </span>
-          </a>
+    <div
+      style={{
+        minHeight: "100vh",
+        backgroundColor: "#000000",
+        color: "white",
+        fontFamily: "Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
+        overflowX: "hidden",
+      }}
+    >
+      <style>{`
+  * { box-sizing: border-box; }
 
-          <div className="hidden md:flex md:items-center md:gap-8">
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="relative text-sm font-medium text-[#A0AEC0] transition-colors hover:text-white"
-              >
-                {link.label}
-                <span className="absolute bottom-0 left-1/2 h-px w-0 -translate-x-1/2 bg-[#3B6EF8] transition-all duration-300 hover:w-full origin-center scale-x-0 hover:scale-x-100" />
-              </a>
-            ))}
-          </div>
+  .max-width-container { max-width: 1120px; margin: 0 auto; }
 
-          <div className="flex items-center gap-4">
+  .hero-section { padding-bottom: 80px; }
+  .hero-dashboard-card { display: flex; }
+
+  .process-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
+  .stats-bar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+  }
+  .bento-wide { grid-row: span 2; }
+
+  .why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  .testimonial-stats-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+
+  .reviews-row { display: flex; gap: 16px; width: max-content; }
+
+  @keyframes marquee-left {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  @keyframes marquee-right {
+    0% { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
+  }
+
+  .marquee-track {
+    animation: marquee-left 40s linear infinite;
+  }
+
+  .marquee-track-reverse {
+    animation: marquee-right 45s linear infinite;
+  }
+
+  .marquee-track:hover,
+  .marquee-track-reverse:hover {
+    animation-play-state: paused;
+  }
+
+  .pulse-ring {
+    animation: pulse-ring 2s infinite;
+  }
+
+  @keyframes pulse-ring {
+    0% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.06); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.5; }
+  }
+
+  @media (max-width: 640px) {
+    .hero-section {
+      padding-top: 120px !important;
+      padding-left: 20px !important;
+      padding-right: 20px !important;
+    }
+    .hero-dashboard-card { display: none !important; }
+    .hero-buttons {
+      flex-direction: column !important;
+      align-items: center !important;
+      gap: 10px !important;
+    }
+    .hero-buttons button {
+      width: 100% !important;
+      max-width: 320px !important;
+    }
+
+    .process-grid { grid-template-columns: 1fr !important; }
+    .stats-bar { grid-template-columns: 1fr !important; }
+
+    .bento-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+    .bento-wide { grid-row: auto !important; }
+
+    .why-grid { grid-template-columns: 1fr !important; }
+
+    .testimonial-layout {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 24px !important;
+      align-items: center !important;
+    }
+    .testimonial-stats-grid { grid-template-columns: 2fr 2fr !important; }
+
+    nav {
+      min-width: unset !important;
+      width: calc(100% - 32px) !important;
+      padding: 8px 8px 8px 12px !important;
+      gap: 8px !important;
+    }
+    .nav-links { display: none !important; }
+    .nav-mobile-menu { display: flex !important; }
+  }
+
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .hero-section {
+      padding-top: 130px !important;
+      padding-left: 32px !important;
+      padding-right: 32px !important;
+    }
+    .hero-dashboard-card { display: none !important; }
+
+    .process-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+    .stats-bar { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+
+    .bento-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 20px !important; }
+
+    .why-grid { grid-template-columns: 1fr 1fr !important; }
+
+    .testimonial-layout {
+      display: grid !important;
+      grid-template-columns: 1.1fr 1fr !important;
+      gap: 32px !important;
+      align-items: center !important;
+    }
+
+    nav {
+      min-width: 660px !important;
+      width: auto !important;
+    }
+  }
+
+  @media (min-width: 1025px) {
+    .hero-section {
+      padding-top: 150px !important;
+    }
+  }
+      `}</style>
+
+      <Navbar />
+
+      {/* MOBILE NAV DROPDOWN */}
+        {mobileMenuOpen && (
+        <div
+          style={{
+            position: "fixed",
+            top: 76,
+            left: 16,
+            right: 16,
+            backgroundColor: "#05090F",
+            border: "1px solid #1E293B",
+            borderRadius: 20,
+            padding: 10,
+            zIndex: 90,
+            boxShadow: "0 24px 80px rgba(0,0,0,0.9)",
+          }}
+        >
+          {[
+            { label: "Home", href: "/" },
+            { label: "Roofing", href: "/seo-for-roofers" },
+            { label: "HVAC", href: "/hvac-digital-marketing" },
+            { label: "Facebook Ads", href: "/facebook-ads-home-improvement" },
+            { label: "Contractors", href: "/contractor-marketing" },
+          ].map((link) => (
             <a
-              href="#pricing"
-              className="hidden rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition-all duration-[400ms] hover:brightness-110 hover:scale-[1.02] md:inline-block"
+              key={link.label}
+              href={link.href}
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "12px 18px",
+                color: link.label === "Home" ? "#16C05A" : "#E5E7EB",
+                textDecoration: "none",
+                fontSize: 15,
+                fontWeight: 500,
+                borderRadius: 12,
+                transition: "background 0.15s ease, color 0.15s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#111827";
+                e.currentTarget.style.color = "#16C05A";
+                const dot = e.currentTarget.querySelector(
+                  'span[data-dot="true"]'
+                ) as HTMLSpanElement | null;
+                if (dot) {
+                  dot.style.opacity = "1";
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "transparent";
+                e.currentTarget.style.color =
+                  link.label === "Home" ? "#16C05A" : "#E5E7EB";
+                const dot = e.currentTarget.querySelector(
+                  'span[data-dot="true"]'
+                ) as HTMLSpanElement | null;
+                if (dot && link.label !== "Home") {
+                  dot.style.opacity = "0";
+                }
+              }}
             >
-              Get Template →
+              <span>{link.label}</span>
+              <span
+                data-dot="true"
+                style={{
+                  width: 4,
+                  height: 4,
+                  borderRadius: "50%",
+                  backgroundColor: "#16C05A",
+                  opacity: link.label === "Home" ? 1 : 0,
+                  transition: "opacity 0.2s ease",
+                }}
+              />
             </a>
+          ))}
+          <div style={{ padding: "8px 4px 4px" }}>
             <button
               type="button"
-              className="md:hidden rounded-lg p-2 text-white"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Menu"
+              onClick={handleCalendlyClick}
+              style={{
+                width: "100%",
+                backgroundColor: "#16C05A",
+                color: "black",
+                border: "none",
+                borderRadius: 12,
+                padding: 13,
+                fontSize: 15,
+                fontWeight: 700,
+                cursor: "pointer",
+              }}
             >
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+              Book a Call
             </button>
-          </div>
-        </nav>
-
-        {mobileMenuOpen && (
-          <div className="border-t border-white/10 bg-black/95 backdrop-blur-xl md:hidden">
-            <div className="flex flex-col gap-1 px-6 py-4">
-              {navLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  className="rounded-lg py-3 px-4 text-[#A0AEC0] hover:bg-white/5 hover:text-white"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {link.label}
-                </a>
-              ))}
-              <a
-                href="#pricing"
-                className="mt-2 rounded-full bg-white py-3 text-center text-sm font-semibold text-black"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Get Template →
-              </a>
             </div>
           </div>
         )}
-      </header>
 
-      {/* ========== HERO ========== */}
-      <HeroSection heroInView={heroInView} />
-
-      {/* ========== HOW IT WORKS ========== */}
-      <HowItWorksSection />
-
-      {/* ========== FEATURES BENTO ========== */}
-      <FeaturesSection />
-
-      {/* ========== BENEFITS ========== */}
-      <BenefitsSection />
-
-      {/* ========== PRICING ========== */}
-      <PricingSection />
-
-      {/* ========== INTEGRATIONS ========== */}
-      <IntegrationsSection />
-
-      {/* ========== TESTIMONIALS ========== */}
-      <TestimonialsSection />
-
-      {/* ========== FINAL CTA ========== */}
-      <FinalCTASection />
-
-      {/* ========== FOOTER ========== */}
-      <FooterSection />
-    </div>
-  );
-}
-
-function HeroSection({ heroInView }: { heroInView: boolean }) {
-  const { ref, isInView } = useInView();
-  const stat1 = useCountUp(275, isInView);
-  const stat2 = useCountUp(5, isInView);
-  const delay = (ms: number) => ({
-    transition: `opacity 400ms cubic-bezier(0.16, 1, 0.3, 1) ${ms}ms, transform 400ms cubic-bezier(0.16, 1, 0.3, 1) ${ms}ms`,
-    opacity: heroInView ? 1 : 0,
-    transform: heroInView ? "translateY(0)" : "translateY(30px)",
-  });
-
-  return (
-    <section
-      id="home"
-      ref={ref}
-      className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#000000] px-6 pt-24 pb-20"
-    >
-      <div
-        className="pointer-events-none absolute inset-0 bg-[length:100%_100%] opacity-15"
-        style={{
-          background: "radial-gradient(ellipse at 50% 30%, rgba(59,110,248,0.4) 0%, transparent 60%)",
-        }}
-      />
-      <div className="relative z-10 mx-auto max-w-4xl text-center">
-        <div
-          style={delay(0)}
-          className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#1E293B] bg-[#0D1117] px-4 py-2 text-sm text-[#A0AEC0]"
-        >
-          <Sparkles className="h-4 w-4 text-[#3B6EF8]" />
-          Automate Your Outreach
-        </div>
-        <h1
-          style={delay(200)}
-          className="font-syne text-[48px] font-extrabold leading-[1.1] tracking-tight text-white md:text-[80px]"
-        >
-          Find Clients on
-          <br />
-          Autopilot with AI
-        </h1>
-        <p
-          style={delay(400)}
-          className="mx-auto mt-6 max-w-2xl text-lg text-[#A0AEC0] md:text-xl"
-        >
-          Tell AI who you&apos;re looking for. It finds leads, sends outreach
-          across 5 channels, handles replies, and books appointments.
-        </p>
-        <div
-          style={delay(600)}
-          className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
-        >
-          <a
-            href="#pricing"
-            className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#3B6EF8] to-[#5B82FA] px-8 py-4 text-base font-bold text-white shadow-lg shadow-[#3B6EF8]/30 transition-all duration-[400ms] hover:brightness-110 hover:scale-[1.02] hover:shadow-[#3B6EF8]/50"
-          >
-            Get Started
-          </a>
-          <a
-            href="#how-it-works"
-            className="inline-flex items-center justify-center rounded-full border border-[#1E293B] px-8 py-4 text-base font-medium text-white transition-all duration-[400ms] hover:border-[#3B6EF8] hover:bg-white/5"
-          >
-            See How It Works
-          </a>
-        </div>
-        <div
-          style={delay(800)}
-          className="mt-16 flex flex-wrap items-center justify-center gap-8 border-t border-[#1E293B] pt-16"
-        >
-          <div className="flex flex-col items-center">
-            <span className="font-syne text-3xl font-bold text-white">
-              {stat1}M+
-            </span>
-            <span className="text-sm text-[#A0AEC0]">Leads in Database</span>
-          </div>
-          <div className="h-12 w-px bg-[#1E293B]" />
-          <div className="flex flex-col items-center">
-            <span className="font-syne text-3xl font-bold text-white">
-              {stat2}
-            </span>
-            <span className="text-sm text-[#A0AEC0]">Outreach Channels</span>
-          </div>
-          <div className="h-12 w-px bg-[#1E293B]" />
-          <div className="flex flex-col items-center">
-            <span className="font-syne text-3xl font-bold text-white">24/7</span>
-            <span className="text-sm text-[#A0AEC0]">AI Setter Active</span>
-          </div>
-        </div>
-        <div
+      <main
+        id="home"
+        className="max-width-container"
+        style={{ padding: "0 16px 80px" }}
+      >
+        {/* HERO */}
+        <section
+          className="hero-section"
           style={{
-            ...delay(600),
-            transform: heroInView ? "scale(1) translateY(0)" : "scale(0.95) translateY(30px)",
-            opacity: heroInView ? 1 : 0,
+            position: "relative",
           }}
-          className="mt-20"
         >
-          <HeroMockup />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function HeroMockup() {
-  return (
-    <div
-      className="animate-float mx-auto max-w-4xl rounded-2xl border border-transparent p-[1px]"
-      style={{
-        background: "linear-gradient(135deg, #3B6EF8, #8B5CF6)",
-        transform: "perspective(1000px) rotateX(5deg)",
-        boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)",
-      }}
-    >
-      <div className="overflow-hidden rounded-[15px] bg-[#0D1117]">
-        <div className="flex items-center gap-2 border-b border-[#1E293B] px-4 py-3">
-          <div className="flex gap-1.5">
-            <div className="h-3 w-3 rounded-full bg-[#FF5F57]" />
-            <div className="h-3 w-3 rounded-full bg-[#FEBC2E]" />
-            <div className="h-3 w-3 rounded-full bg-[#28C840]" />
-          </div>
-          <div className="ml-4 flex-1 rounded-lg bg-[#1E293B]/50 px-4 py-2 text-left text-xs text-[#A0AEC0]">
-            app.zyvro.com/dashboard
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4 p-6 md:grid-cols-3">
-          {[60, 75, 45, 90, 55, 70].map((h, i) => (
-            <div
-              key={i}
-              className="flex items-end gap-1 rounded-lg bg-[#1E293B]/30 p-2"
-              style={{ height: 80 }}
-            >
-              <div
-                className="flex-1 rounded bg-[#3B6EF8]"
-                style={{ height: `${h}%` }}
-              />
-              <div
-                className="flex-1 rounded bg-[#3B6EF8]/70"
-                style={{ height: `${(h + 10) % 100}%` }}
-              />
-            </div>
-          ))}
-        </div>
-        <div className="border-t border-[#1E293B] p-4">
-          <div className="flex items-center gap-3 rounded-xl bg-[#1E293B]/50 p-4">
-            <div className="flex gap-1">
-              {[...Array(8)].map((_, i) => (
-                <div
-                  key={i}
-                  className="h-8 w-1 rounded-full bg-[#3B6EF8] animate-pulse"
-                  style={{ animationDelay: `${i * 0.1}s` }}
-                />
-              ))}
-            </div>
-            <div>
-              <p className="font-medium text-white">AI Assistant</p>
-              <p className="text-sm text-[#A0AEC0]">Ready to find leads</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function HowItWorksSection() {
-  const { ref, isInView } = useInView();
-  const stagger = (i: number) => ({
-    opacity: isInView ? 1 : 0,
-    transform: isInView ? "translateY(0)" : "translateY(30px)",
-    transition: `opacity 400ms cubic-bezier(0.16, 1, 0.3, 1) ${i * 100}ms, transform 400ms cubic-bezier(0.16, 1, 0.3, 1) ${i * 100}ms`,
-  });
-
-  const steps = [
-    {
-      icon: User,
-      label: "STEP 1",
-      title: "Describe Your Ideal Client",
-      body: "Chat with AI to define your target market. Tell it who you want to reach — industry, title, location, size.",
-    },
-    {
-      icon: Search,
-      label: "STEP 2",
-      title: "AI Finds 200+ Leads",
-      body: "Our system searches LinkedIn, Google Maps, and Apollo to find verified contacts that match your ICP.",
-    },
-    {
-      icon: Rocket,
-      label: "STEP 3",
-      title: "Outreach Runs Automatically",
-      body: "Campaigns fire across email, LinkedIn, SMS, and Instagram. AI handles all replies and books appointments.",
-    },
-  ];
-
-  return (
-    <section id="how-it-works" className="bg-[#000000] py-24 px-6" ref={ref}>
-      <div className="mx-auto max-w-6xl">
-        <div style={stagger(0)} className="flex justify-center">
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-[#1E293B] bg-[#0D1117] px-4 py-2 text-sm text-[#A0AEC0]">
-            <Settings className="h-4 w-4 text-[#3B6EF8]" />
-            How It Works
-          </div>
-        </div>
-        <h2
-          style={stagger(1)}
-          className="font-syne text-center text-3xl font-bold text-white md:text-4xl"
-        >
-          Get Started in Just Few Simple Steps
-        </h2>
-        <p
-          style={stagger(2)}
-          className="mx-auto mt-4 max-w-2xl text-center text-[#A0AEC0]"
-        >
-          One platform to manage it all, so your team can focus on progress, not
-          process.
-        </p>
-        <div className="mt-16 grid gap-8 md:grid-cols-3">
-          {steps.map((step, i) => (
-            <div
-              key={step.label}
-              style={stagger(3 + i)}
-              className="rounded-2xl border border-[#1E293B] bg-[#0D1117] p-8 transition-all duration-[400ms] hover:-translate-y-1 hover:shadow-lg hover:shadow-[#3B6EF8]/20"
-            >
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#3B6EF8]/20 text-[#3B6EF8]">
-                <step.icon className="h-7 w-7" />
-              </div>
-              <span className="text-xs font-medium uppercase tracking-wider text-[#3B6EF8]">
-                {step.label}
-              </span>
-              <h3 className="mt-2 font-syne text-xl font-bold text-white">
-                {step.title}
-              </h3>
-              <p className="mt-3 text-[#A0AEC0]">{step.body}</p>
-            </div>
-          ))}
-        </div>
-        <div
-          style={stagger(6)}
-          className="mt-16 flex flex-col items-center justify-between gap-6 rounded-2xl border border-[#1E293B] bg-[#0D1117] p-8 md:flex-row"
-        >
-          <p className="font-syne text-xl font-bold text-white">
-            Setup So Simple, It Just Works — Let&apos;s Set Things Up!
-          </p>
-          <a
-            href="#pricing"
-            className="shrink-0 rounded-full bg-gradient-to-r from-[#3B6EF8] to-[#5B82FA] px-8 py-3 font-bold text-white transition-all duration-[400ms] hover:brightness-110 hover:scale-[1.02]"
+          {/* Background glow and grid */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              pointerEvents: "none",
+              zIndex: -1,
+            }}
           >
-            Get Started
-          </a>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function FeaturesSection() {
-  const { ref, isInView } = useInView();
-  const stagger = (i: number) => ({
-    opacity: isInView ? 1 : 0,
-    transform: isInView ? "translateY(0)" : "translateY(30px)",
-    transition: `opacity 400ms cubic-bezier(0.16, 1, 0.3, 1) ${i * 100}ms, transform 400ms cubic-bezier(0.16, 1, 0.3, 1) ${i * 100}ms`,
-  });
-
-  const cards = [
-    {
-      size: "large" as const,
-      title: "AI Lead Scoring",
-      body: "Every lead scored 0-100 by AI so you focus on the hottest prospects first.",
-      visual: "orb",
-      badge: "+15% Lead Score",
-    },
-    {
-      size: "medium" as const,
-      title: "Continual Campaign Improvement",
-      body: "AI learns which messages get replies and auto-optimizes your outreach sequences.",
-      visual: "bars",
-      header: "Revenue trend / Summary Statistics",
-    },
-    {
-      size: "small" as const,
-      title: "Scalable Interface",
-      body: "Dashboard grows with your business from 500 to 50,000 leads.",
-      visual: "browser",
-    },
-    {
-      size: "small" as const,
-      title: "Intelligent Inbox",
-      body: "One unified inbox for all channels — email, LinkedIn, SMS, Instagram.",
-      visual: "list",
-    },
-    {
-      size: "medium" as const,
-      title: "Effortless Onboarding",
-      body: "Describe your ideal client in plain English. AI handles the rest in minutes.",
-      visual: "chat",
-    },
-    {
-      size: "large" as const,
-      title: "Actionable Analytics",
-      body: "Track reply rates, booking rates, and revenue attribution per campaign.",
-      visual: "line",
-    },
-  ];
-
-  return (
-    <section id="features" className="bg-[#000000] py-24 px-6" ref={ref}>
-      <div className="mx-auto max-w-6xl">
-        <div style={stagger(0)} className="flex justify-center">
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-[#1E293B] bg-[#0D1117] px-4 py-2 text-sm text-[#A0AEC0]">
-            <Star className="h-4 w-4 text-[#3B6EF8]" />
-            Features
-          </div>
-        </div>
-        <h2
-          style={stagger(1)}
-          className="font-syne text-center text-3xl font-bold text-white md:text-4xl"
-        >
-          The Smartest Way to Automate Outreach
-        </h2>
-        <p
-          style={stagger(2)}
-          className="mx-auto mt-4 max-w-2xl text-center text-[#A0AEC0]"
-        >
-          Find leads, send campaigns, handle replies and book meetings — all
-          from one platform.
-        </p>
-        <div className="mt-16 grid grid-cols-1 gap-6 md:grid-cols-3 md:grid-rows-2">
-          {cards.map((card, i) => (
             <div
-              key={i}
-              style={stagger(3 + i)}
-              className={`rounded-2xl border border-[#1E293B] bg-[#0D1117] p-6 transition-all duration-[400ms] hover:-translate-y-1 hover:shadow-lg hover:shadow-[#3B6EF8]/20 ${
-                card.size === "large" ? "md:row-span-1" : ""
-              } ${card.size === "large" ? "md:col-span-1" : ""}`}
+              style={{
+                position: "absolute",
+                inset: 0,
+                opacity: 0.35,
+                backgroundImage:
+                  "radial-gradient(circle at top, rgba(22,192,90,0.22), transparent 60%)",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                opacity: 0.08,
+                backgroundImage:
+                  "linear-gradient(rgba(15,23,42,0.7) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,0.7) 1px, transparent 1px)",
+                backgroundSize: "42px 42px",
+              }}
+            />
+    </div>
+
+          <div
+            style={{
+              maxWidth: 760,
+              margin: "0 auto",
+              textAlign: "center",
+            }}
+          >
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "6px 14px",
+                borderRadius: 999,
+                border: "1px solid rgba(148,163,184,0.4)",
+                backgroundColor: "rgba(15,23,42,0.9)",
+                fontSize: 11,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                color: "#E5E7EB",
+              }}
             >
-              <div className="relative flex h-48 flex-col">
-                {card.visual === "orb" && (
-                  <>
+              <span style={{ marginRight: 6 }}>🏆</span>
+              <span>The #1 Appointment System For Home Improvement Companies</span>
+        </div>
+
+            <h1
+              style={{
+                marginTop: 20,
+                fontSize: "clamp(30px, 4vw, 46px)",
+                fontWeight: 900,
+                lineHeight: 1.08,
+                letterSpacing: "-0.03em",
+              }}
+            >
+              We Help Home Improvement Companies Book{" "}
+              <span
+                style={{
+                  color: "#16C05A",
+                  position: "relative",
+                  display: "inline-block",
+                  paddingBottom: 6,
+                }}
+              >
+                $50k-$100k
+                <span
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    bottom: 0,
+                    width: "100%",
+                    height: 3,
+                    borderRadius: 999,
+                    background:
+                      "linear-gradient(90deg, #16C05A, rgba(22,192,90,0.2))",
+                  }}
+                />
+              </span>{" "}
+              in New Monthly Revenue
+            </h1>
+
+            <p
+              style={{
+                marginTop: 14,
+                fontSize: 16,
+                color: "#CBD5F5",
+                fontWeight: 600,
+              }}
+            >
+              Facebook ads, AI follow up, and human appointment setters in one
+              done for you system.
+            </p>
+
+            <div
+              style={{
+                marginTop: 18,
+                display: "flex",
+                justifyContent: "center",
+                gap: 12,
+                flexWrap: "wrap",
+                fontSize: 13,
+                color: "#9CA3AF",
+              }}
+            >
+              <div>
+                <strong style={{ color: "#FFFFFF" }}>312+</strong> Appointments
+                Booked
+              </div>
+              <span>•</span>
+              <div>
+                <strong style={{ color: "#FFFFFF" }}>30 Days</strong> To See First
+                Results
+      </div>
+              <span>•</span>
+              <div>
+                <strong style={{ color: "#FFFFFF" }}>100%</strong> Done For You
+                Service
+              </div>
+            </div>
+
+            {/* Buttons */}
+            <div
+              className="hero-buttons"
+      style={{
+                marginTop: 26,
+                display: "flex",
+                justifyContent: "center",
+                gap: 12,
+                flexWrap: "wrap",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof window !== "undefined") {
+                    window.location.href = "/book-a-call";
+                  }
+                }}
+        style={{
+          background:
+                    "radial-gradient(circle at top, rgba(22,192,90,0.6), #16C05A)",
+                  color: "black",
+                  border: "none",
+                  borderRadius: 999,
+                  padding: "12px 26px",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  boxShadow:
+                    "0 0 0 1px rgba(22,192,90,0.3), 0 0 40px rgba(22,192,90,0.7)",
+                  transition: "transform 0.15s ease, filter 0.15s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.filter = "brightness(1.06)";
+                  e.currentTarget.style.transform = "translateY(-1px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.filter = "none";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
+              >
+                Book Your Free Strategy Call
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const el =
+                    typeof document !== "undefined"
+                      ? document.getElementById("how-it-works")
+                      : null;
+                  if (el) {
+                    el.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
+          style={{
+                  backgroundColor: "transparent",
+            color: "#FFFFFF",
+                  borderRadius: 999,
+                  padding: "12px 24px",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  border: "1px solid #1E293B",
+                  transition: "background 0.15s ease, border-color 0.15s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#111827";
+                  e.currentTarget.style.borderColor = "#FFFFFF";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent";
+                  e.currentTarget.style.borderColor = "#1E293B";
+                }}
+              >
+                See How It Works
+              </button>
+            </div>
+
+            {/* Trust line */}
+            <div
+              style={{
+                marginTop: 16,
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "center",
+                gap: 10,
+                fontSize: 12,
+                color: "#9CA3AF",
+              }}
+            >
+              <span>
+                <span style={{ color: "#16C05A" }}>✓</span> No contracts
+              </span>
+              <span>•</span>
+              <span>
+                <span style={{ color: "#16C05A" }}>✓</span> Results in 30 days or
+                we work at no cost until we do
+              </span>
+              <span>•</span>
+              <span>
+                <span style={{ color: "#16C05A" }}>✓</span> Done for you setup and
+                campaign management
+              </span>
+        </div>
+
+            {/* Social proof */}
+            <div style={{ marginTop: 26 }}>
+              <p
+                style={{
+                  fontSize: 10,
+                  letterSpacing: "0.2em",
+                  textTransform: "uppercase",
+                  color: "#6B7280",
+                  marginBottom: 8,
+                }}
+              >
+                Trusted by roofers, remodelers, kitchen and bath, hvac, painters
+              </p>
+
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 14,
+                  flexWrap: "wrap",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  {[
+                    "https://i.pravatar.cc/150?img=57",
+                    "https://i.pravatar.cc/150?img=12",
+                    "https://i.pravatar.cc/150?img=53",
+                    "https://i.pravatar.cc/150?img=15",
+                    "https://i.pravatar.cc/150?img=33",
+                  ].map((src, i) => (
                     <div
-                      className="absolute inset-0 rounded-xl opacity-80"
-                      style={{
-                        background: "radial-gradient(circle at 30% 30%, rgba(59,110,248,0.4), transparent 60%)",
+                      key={src}
+                    style={{
+                        width: 34,
+                        height: 34,
+                        borderRadius: "50%",
+                        border: "2px solid #000000",
+                        overflow: "hidden",
+                        marginLeft: i === 0 ? 0 : -12,
+                        zIndex: 5 - i,
+                        boxShadow: "0 0 0 2px rgba(22,192,90,0.35)",
                       }}
-                    />
-                    <div
-                      className="absolute left-1/2 top-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-60"
-                      style={{
-                        background: "radial-gradient(circle, rgba(59,110,248,0.8), transparent)",
-                        boxShadow: "0 0 60px rgba(59,110,248,0.5)",
-                      }}
-                    />
-                    {card.badge && (
-                      <span className="absolute right-0 top-0 rounded-lg bg-[#3B6EF8]/20 px-3 py-1 text-sm font-medium text-[#3B6EF8]">
-                        {card.badge}
-                      </span>
-                    )}
-                  </>
-                )}
-                {card.visual === "bars" && (
-                  <div className="flex h-32 items-end gap-2">
-                    {[40, 65, 45, 80, 55, 70, 90].map((h, j) => (
-                      <div
-                        key={j}
-                        className="flex-1 rounded-t bg-[#3B6EF8] transition-all duration-500"
+                    >
+                      <Image
+                        src={src}
+                        alt="Client"
+                        width={34}
+                        height={34}
+                        style={{ objectFit: "cover" }}
+                      />
+              </div>
+            ))}
+          </div>
+
+                <div
+      style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    fontSize: 13,
+                    flexWrap: "wrap",
+                    justifyContent: "center",
+                  }}
+                >
+                  <span style={{ color: "#FBBF24", letterSpacing: 2 }}>★★★★★</span>
+                  <span style={{ color: "#16C05A", fontWeight: 700 }}>
+                    50+ contractors and remodelers
+                  </span>
+                  <span style={{ color: "#9CA3AF" }}>growing with Voxflow Media</span>
+          </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Dashboard card */}
+          <div
+            className="hero-dashboard-card"
+                    style={{
+              marginTop: 40,
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <div style={{ width: "100%", maxWidth: 820 }}>
+              <div
+                style={{
+                  borderRadius: 20,
+                  boxShadow:
+                    "0 0 0 1px rgba(22,192,90,0.18), 0 0 80px rgba(22,192,90,0.25), 0 40px 80px rgba(0,0,0,0.9)",
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  style={{
+                    backgroundColor: "#020617",
+                    borderRadius: 20,
+                    border: "1px solid #1E293B",
+                    overflow: "hidden",
+                  }}
+                >
+                  {/* Top bar */}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      backgroundColor: "#020617",
+                      borderBottom: "1px solid #1E293B",
+                      padding: "10px 18px",
+                    }}
+                  >
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <span
                         style={{
-                          height: isInView ? `${h}%` : "0%",
-                          transitionDelay: `${j * 50}ms`,
+                          width: 9,
+                          height: 9,
+                          borderRadius: "50%",
+                          backgroundColor: "#EF4444",
                         }}
                       />
-                    ))}
-                  </div>
-                )}
-                {card.visual === "browser" && (
-                  <div className="rounded-lg border border-[#1E293B] bg-[#1E293B]/30 p-2">
-                    <div className="flex gap-1 pb-2">
-                      <div className="h-2 w-2 rounded-full bg-[#FF5F57]" />
-                      <div className="h-2 w-2 rounded-full bg-[#FEBC2E]" />
-                      <div className="h-2 w-2 rounded-full bg-[#28C840]" />
-                    </div>
-                    <div className="h-20 rounded bg-[#0D1117]" />
-                  </div>
-                )}
-                {card.visual === "list" && (
-                  <div className="space-y-2">
-                    {[70, 90, 60, 85].map((w, j) => (
-                      <div
-                        key={j}
-                        className="h-3 rounded-full bg-[#1E293B]"
-                        style={{ width: `${w}%` }}
+                      <span
+                        style={{
+                          width: 9,
+                          height: 9,
+                          borderRadius: "50%",
+                          backgroundColor: "#FACC15",
+                        }}
                       />
-                    ))}
-                  </div>
-                )}
-                {card.visual === "chat" && (
-                  <div className="rounded-xl border border-[#1E293B] bg-[#1E293B]/30 p-4">
-                    <div className="mb-3 h-2 w-3/4 rounded bg-[#3B6EF8]/50" />
-                    <div className="h-10 rounded-lg border border-[#3B6EF8]/50 bg-[#0D1117] px-3 flex items-center text-sm text-[#A0AEC0]">
-                      Ask AI...
-                    </div>
-                  </div>
-                )}
-                {card.visual === "line" && (
-                  <div className="flex items-end justify-between gap-1">
-                    {[20, 35, 30, 50, 45, 70, 65, 85].map((h, j) => (
-                      <div
-                        key={j}
-                        className="h-2 flex-1 rounded-full bg-[#3B6EF8]"
-                        style={{ height: 4, marginTop: `${100 - h}%` }}
+                      <span
+                        style={{
+                          width: 9,
+                          height: 9,
+                          borderRadius: "50%",
+                          backgroundColor: "#16C05A",
+                        }}
                       />
-                    ))}
-                  </div>
-                )}
               </div>
-              {card.header && (
-                <p className="mt-2 text-xs text-[#A0AEC0]">{card.header}</p>
-              )}
-              <h3 className="mt-4 font-syne text-lg font-bold text-white">
-                {card.title}
-              </h3>
-              <p className="mt-2 text-sm text-[#A0AEC0]">{card.body}</p>
+                    <div
+                      style={{
+                        borderRadius: 999,
+                        border: "1px solid #1E293B",
+                        backgroundColor: "#020617",
+                        padding: "4px 14px",
+                        fontSize: 11,
+                        color: "#64748B",
+                      }}
+                    >
+                      voxflowmedia.com/dashboard
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span
+                        className="pulse-ring"
+                        style={{
+                          width: 7,
+                          height: 7,
+                          borderRadius: "50%",
+                          backgroundColor: "#16C05A",
+                        }}
+                      />
+                      <span
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 600,
+                          color: "#16C05A",
+                        }}
+                      >
+                        Live Results
+                      </span>
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
-function BenefitsSection() {
-  const { ref, isInView } = useInView();
-  const stagger = (i: number) => ({
-    opacity: isInView ? 1 : 0,
-    transform: isInView ? "translateY(0)" : "translateY(30px)",
-    transition: `opacity 400ms cubic-bezier(0.16, 1, 0.3, 1) ${i * 100}ms, transform 400ms cubic-bezier(0.16, 1, 0.3, 1) ${i * 100}ms`,
-  });
+                  {/* Body */}
+                  <div style={{ padding: "18px 18px 20px" }}>
+                    <div
+                      style={{
+                        marginBottom: 16,
+                        fontSize: 11,
+                        letterSpacing: "0.18em",
+                        textTransform: "uppercase",
+                        color: "#9CA3AF",
+                      }}
+                    >
+                      📊 Client Results - Last 30 Days
+              </div>
 
-  const benefits = [
-    { icon: Clock, title: "Optimize Time & Effort", body: "Spend less time on manual outreach and more on closing deals." },
-    { icon: TrendingUp, title: "Boost Productivity", body: "Scale your pipeline without scaling your team." },
-    { icon: BarChart3, title: "Data-Driven Decisions", body: "Every action is measured and optimized by AI." },
-    { icon: MapPin, title: "Remote Friendly", body: "Run campaigns from anywhere, anytime." },
-  ];
-
-  return (
-    <section
-      id="about"
-      className="bg-gradient-to-b from-[#000000] to-[#0D1117] py-24 px-6"
-      ref={ref}
-    >
-      <div className="mx-auto max-w-4xl">
-        <div style={stagger(0)} className="flex justify-center">
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-[#1E293B] bg-[#0D1117] px-4 py-2 text-sm text-[#A0AEC0]">
-            <LayoutGrid className="h-4 w-4 text-[#3B6EF8]" />
-            Benefits
-          </div>
-        </div>
-        <h2
-          style={stagger(1)}
-          className="font-syne text-center text-3xl font-bold text-white md:text-4xl"
-        >
-          Top AI Advantages for Your Business
-        </h2>
-        <p
-          style={stagger(2)}
-          className="mx-auto mt-4 max-w-xl text-center text-[#A0AEC0]"
-        >
-          We simplify your workflow so you can focus on what matters most:
-          client acquisition.
-        </p>
-        <div className="mt-16 grid grid-cols-1 gap-6 md:grid-cols-3 md:grid-rows-3">
-          <div style={stagger(3)} className="flex flex-col items-center rounded-2xl border border-[#1E293B] bg-[#0D1117] p-8 text-center">
-            <Clock className="h-12 w-12 text-white" strokeWidth={1.5} />
-            <h3 className="mt-4 font-syne text-lg font-bold text-white">{benefits[0].title}</h3>
-            <p className="mt-2 text-[#A0AEC0]">{benefits[0].body}</p>
-          </div>
-          <div className="hidden md:block" />
-          <div style={stagger(4)} className="flex flex-col items-center rounded-2xl border border-[#1E293B] bg-[#0D1117] p-8 text-center">
-            <TrendingUp className="h-12 w-12 text-white" strokeWidth={1.5} />
-            <h3 className="mt-4 font-syne text-lg font-bold text-white">{benefits[1].title}</h3>
-            <p className="mt-2 text-[#A0AEC0]">{benefits[1].body}</p>
-          </div>
-          <div className="hidden md:block" />
-          <div
-            style={stagger(5)}
-            className="flex flex-col items-center justify-center rounded-2xl border border-[#1E293B] bg-[#0D1117] p-8 md:col-span-1 md:row-span-1"
-          >
-            <div className="animate-pulse-glow flex h-24 w-24 items-center justify-center rounded-full bg-[#0D1117] border border-[#3B6EF8]/30">
-              <span className="font-syne text-3xl font-extrabold text-[#3B6EF8]">Z</span>
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+                        gap: 10,
+                      }}
+                    >
+                      {[
+                        {
+                          label: "Homeowners Reached",
+                          value: "48,200",
+                          delta: "+2,400 this week",
+                        },
+                        {
+                          label: "Calls Booked",
+                          value: "312",
+                          delta: "+28 this week",
+                        },
+                        {
+                          label: "Qualified Leads",
+                          value: "1,847",
+                          delta: "+143 this week",
+                        },
+                        {
+                          label: "Revenue Added",
+                          value: "$94k",
+                          delta: "+$12k this week",
+                        },
+                      ].map((stat) => (
+                        <div
+                          key={stat.label}
+                          style={{
+                            borderRadius: 16,
+                            border: "1px solid #1E293B",
+                            backgroundColor: "#020617",
+                            padding: "12px 12px 10px",
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontSize: 11,
+                              color: "#64748B",
+                              marginBottom: 4,
+                            }}
+                          >
+                            {stat.label}
+                      </div>
+                          <div
+                            style={{
+                              fontSize: 22,
+                              fontWeight: 800,
+                              color: "#F9FAFB",
+                            }}
+                          >
+                            {stat.value}
+                      </div>
+                          <div
+                            style={{
+                              fontSize: 11,
+                              color: "#16C05A",
+                              marginTop: 2,
+                            }}
+                          >
+                            {stat.delta}
+                    </div>
+                  </div>
+                ))}
             </div>
-            <span className="mt-3 font-syne text-xl font-bold text-white">Zyvro</span>
-          </div>
-          <div className="hidden md:block" />
-          <div style={stagger(6)} className="flex flex-col items-center rounded-2xl border border-[#1E293B] bg-[#0D1117] p-8 text-center">
-            <BarChart3 className="h-12 w-12 text-white" strokeWidth={1.5} />
-            <h3 className="mt-4 font-syne text-lg font-bold text-white">{benefits[2].title}</h3>
-            <p className="mt-2 text-[#A0AEC0]">{benefits[2].body}</p>
-          </div>
-          <div className="hidden md:block" />
-          <div style={stagger(7)} className="flex flex-col items-center rounded-2xl border border-[#1E293B] bg-[#0D1117] p-8 text-center">
-            <MapPin className="h-12 w-12 text-white" strokeWidth={1.5} />
-            <h3 className="mt-4 font-syne text-lg font-bold text-white">{benefits[3].title}</h3>
-            <p className="mt-2 text-[#A0AEC0]">{benefits[3].body}</p>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 
-function PricingSection() {
-  const { ref, isInView } = useInView();
-  const [yearly, setYearly] = useState(false);
-  const stagger = (i: number) => ({
-    opacity: isInView ? 1 : 0,
-    transform: isInView ? "translateY(0)" : "translateY(30px)",
-    transition: `opacity 400ms cubic-bezier(0.16, 1, 0.3, 1) ${i * 100}ms, transform 400ms cubic-bezier(0.16, 1, 0.3, 1) ${i * 100}ms`,
-  });
-
-  const plans = [
-    {
-      name: "Starter",
-      price: 97,
-      features: ["500 leads/mo", "Email outreach only", "1 campaign", "Basic analytics", "1 user"],
-      cta: "Choose Plan",
-      featured: false,
-      outline: true,
-    },
-    {
-      name: "Growth",
-      price: 297,
-      features: [
-        "2,000 leads/mo",
-        "Email + LinkedIn + SMS",
-        "5 campaigns",
-        "Advanced analytics",
-        "AI Setter bot",
-        "3 users",
-      ],
-      cta: "Choose Plan",
-      featured: true,
-      outline: false,
-    },
-    {
-      name: "Agency",
-      price: 697,
-      features: [
-        "Unlimited leads",
-        "All 5 channels",
-        "Unlimited campaigns",
-        "White-label",
-        "Full analytics",
-        "5 users",
-      ],
-      cta: "Choose Plan",
-      featured: false,
-      outline: true,
-    },
-  ];
-
-  return (
-    <section id="pricing" className="bg-[#000000] py-24 px-6" ref={ref}>
-      <div className="mx-auto max-w-6xl">
-        <div style={stagger(0)} className="flex justify-center">
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-[#1E293B] bg-[#0D1117] px-4 py-2 text-sm text-[#A0AEC0]">
-            <DollarSign className="h-4 w-4 text-[#3B6EF8]" />
-            Pricing Plans
-          </div>
-        </div>
-        <h2
-          style={stagger(1)}
-          className="font-syne text-center text-3xl font-bold text-white md:text-4xl"
-        >
-          Plans Built to Scale With Your Business
-        </h2>
-        <div style={stagger(2)} className="mt-8 flex justify-center">
-          <div className="flex items-center gap-2 rounded-full border border-[#1E293B] bg-[#0D1117] p-1">
-            <button
-              type="button"
-              onClick={() => setYearly(false)}
-              className={`rounded-full px-6 py-2 text-sm font-medium transition-all ${
-                !yearly ? "bg-[#3B6EF8] text-white" : "text-[#A0AEC0] hover:text-white"
-              }`}
-            >
-              Monthly
-            </button>
-            <button
-              type="button"
-              onClick={() => setYearly(true)}
-              className={`relative rounded-full px-6 py-2 text-sm font-medium transition-all ${
-                yearly ? "bg-[#3B6EF8] text-white" : "text-[#A0AEC0] hover:text-white"
-              }`}
-            >
-              Yearly
-              <span className="absolute -right-2 -top-1 rounded bg-green-500/80 px-1.5 text-xs text-white">
-                Save 20%
-              </span>
-            </button>
-          </div>
-        </div>
-        <div className="mt-16 grid gap-8 md:grid-cols-3">
-          {plans.map((plan, i) => (
-            <div
-              key={plan.name}
-              style={stagger(3 + i)}
-              className={`relative rounded-2xl border bg-[#0D1117] p-8 ${
-                plan.featured
-                  ? "scale-105 border-[#3B6EF8] shadow-lg shadow-[#3B6EF8]/20 md:scale-105"
-                  : "border-[#1E293B]"
-              } transition-all duration-[400ms] hover:-translate-y-1 hover:shadow-lg hover:shadow-[#3B6EF8]/20`}
-            >
-              {plan.featured && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-[#3B6EF8] to-[#5B82FA] px-4 py-1 text-sm font-bold text-white">
-                  Best Value
+                    {/* Active campaign */}
+                    <div
+                    style={{
+                        marginTop: 16,
+                        borderRadius: 16,
+                        border: "1px solid rgba(22,192,90,0.3)",
+                        background:
+                          "linear-gradient(135deg, rgba(15,118,110,0.3), rgba(15,23,42,0.95))",
+                        padding: "12px 14px",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 8,
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                          fontSize: 13,
+                          color: "#E5E7EB",
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <span
+                          style={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: "50%",
+                            backgroundColor: "#16C05A",
+                          }}
+                        />
+                        <span>
+                          Facebook Ads + AI Follow Up - Kitchen Remodeling
+                          Campaign
+                        </span>
                 </div>
-              )}
-              <h3 className="font-syne text-xl font-bold text-white">{plan.name}</h3>
-              <p className="mt-4 flex items-baseline gap-1">
-                <span className="font-syne text-4xl font-bold text-white">
-                  ${yearly ? plan.price * 10 : plan.price}
+                      <div
+                        style={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: 10,
+                          alignItems: "center",
+                          fontSize: 12,
+                          color: "#E5E7EB",
+                        }}
+                      >
+                        <span style={{ color: "#16C05A", fontWeight: 700 }}>
+                          23 appointments booked today
+                        </span>
+                        <span
+                          style={{
+                            borderRadius: 999,
+                            padding: "4px 10px",
+                            backgroundColor: "#16C05A",
+                            color: "#000000",
+                            fontSize: 11,
+                            fontWeight: 700,
+                          }}
+                        >
+                          Active
+                        </span>
+                  </div>
+                  </div>
+                </div>
+              </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* OUR PROCESS */}
+        <section style={{ padding: "80px 0 70px" }}>
+          <div
+            className="max-width-container"
+            style={{ maxWidth: 1100, margin: "0 auto", textAlign: "center" }}
+          >
+            <span
+                    style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "6px 14px",
+                borderRadius: 999,
+                backgroundColor: "rgba(22,192,90,0.08)",
+                border: "1px solid rgba(22,192,90,0.25)",
+                fontSize: 11,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                color: "#16C05A",
+              }}
+            >
+              Our Process
+              </span>
+
+            <h2
+              style={{
+                marginTop: 18,
+                fontSize: "clamp(26px, 3vw, 34px)",
+                fontWeight: 900,
+                lineHeight: 1.15,
+              }}
+            >
+              From Ad Click to Booked Appointment in 24 Hours
+            </h2>
+            <p
+              style={{
+                marginTop: 10,
+                fontSize: 15,
+                color: "#9CA3AF",
+                maxWidth: 520,
+                marginLeft: "auto",
+                marginRight: "auto",
+              }}
+            >
+              A simple five step system that takes homeowners from first click to
+              confirmed booking without you lifting a finger.
+            </p>
+
+            {/* How the system works - video */}
+            <div
+              id="how-it-works"
+              style={{
+                marginTop: 48,
+                marginBottom: 48,
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: 20,
+                  fontWeight: 700,
+                  marginBottom: 20,
+                  color: "#FFFFFF",
+                }}
+              >
+                How the system works
+              </h3>
+              <div
+                style={{
+                  maxWidth: 800,
+                  margin: "0 auto",
+                  borderRadius: 16,
+                  overflow: "hidden",
+                  border: "1px solid #1E293B",
+                  background: "#0D1117",
+                }}
+              >
+                <video
+                  controls
+                  playsInline
+                  style={{ width: "100%", display: "block" }}
+                  poster=""
+                >
+                  <source src="/explainationvideo.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            </div>
+
+            <div style={{ position: "relative", marginTop: 40 }}>
+              <div
+                style={{
+                  position: "absolute",
+                  top: 38,
+                  left: "6%",
+                  right: "6%",
+                  height: 1,
+                  background:
+                    "linear-gradient(90deg, transparent, rgba(148,163,184,0.5), transparent)",
+                  zIndex: 0,
+                }}
+              />
+
+              <div className="process-grid" style={{ position: "relative" }}>
+                {[
+                  {
+                    step: "Step 1",
+                    title: "We Launch Targeted Ads",
+                    desc: "High intent campaigns on Facebook and Instagram built for your ideal homeowner.",
+                    color: "#3B82F6",
+                    icon: "🎯",
+                  },
+                  {
+                    step: "Step 2",
+                    title: "Homeowner Sees Your Ad",
+                    desc: "Landing pages and forms convert clicks into real lead data we can work with.",
+                    color: "#A855F7",
+                    icon: "👀",
+                  },
+                  {
+                    step: "Step 3",
+                    title: "AI Contacts in 60 Seconds",
+                    desc: "Our AI agent sends texts and emails right away so leads never go cold.",
+                    color: "#F59E0B",
+                    icon: "🤖",
+                  },
+                  {
+                    step: "Step 4",
+                    title: "Lead Gets Qualified",
+                    desc: "Human setters confirm budget, location, and project details before you ever talk.",
+                    color: "#EF4444",
+                    icon: "📞",
+                  },
+                  {
+                    step: "Step 5",
+                    title: "Appointment Booked",
+                    desc: "Qualified homeowners are placed directly onto your calendar ready to buy.",
+                    color: "#16C05A",
+                    icon: "📅",
+                    final: true,
+                  },
+                ].map((item, index) => (
+                  <div
+                    key={item.step}
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      textAlign: "left",
+                      position: "relative",
+                      zIndex: 1,
+                    }}
+    >
+      <div
+        style={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: "50%",
+          background:
+                          item.final === true
+                            ? "radial-gradient(circle at top, #16C05A, #14532d)"
+                            : "radial-gradient(circle at top, rgba(148,163,184,0.15), rgba(15,23,42,1))",
+                        border: `2px solid ${
+                          item.final === true ? "#16C05A" : "rgba(148,163,184,0.4)"
+                        }`,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "white",
+                        fontSize: 24,
+                        boxShadow:
+                          item.final === true
+                            ? "0 0 32px rgba(22,192,90,0.8)"
+                            : "0 0 16px rgba(15,23,42,0.8)",
+                        marginBottom: 14,
+                      }}
+                    >
+                      {item.icon}
+                    </div>
+                    <div
+          style={{
+                        width: "100%",
+                        borderRadius: 18,
+                        padding: "18px 16px 16px",
+                        background:
+                          "linear-gradient(145deg, #020617, rgba(15,23,42,0.96))",
+                        border: "1px solid #1E293B",
+            boxShadow:
+                          "0 16px 40px rgba(0,0,0,0.75), 0 0 0 1px rgba(15,23,42,1)",
+                        minHeight: 150,
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: 11,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.16em",
+                          color: "rgba(148,163,184,0.9)",
+                          marginBottom: 4,
+                        }}
+                      >
+                        {item.step}
+            </div>
+                      <div
+                        style={{
+                          fontSize: 15,
+                          fontWeight: 700,
+                          color: "#E5E7EB",
+                          marginBottom: 6,
+                        }}
+                      >
+                        {item.title}
+      </div>
+                      <p
+                        style={{
+                          fontSize: 13,
+                          color: "#9CA3AF",
+                          lineHeight: 1.6,
+                          margin: 0,
+                        }}
+                      >
+                        {item.desc}
+                      </p>
+                </div>
+                </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Stats bar */}
+            <div
+              className="stats-bar"
+              style={{
+                marginTop: 38,
+                borderRadius: 20,
+                border: "1px solid #1E293B",
+                background:
+                  "radial-gradient(circle at top, rgba(22,192,90,0.14), #020617)",
+                overflow: "hidden",
+              }}
+            >
+              {[
+                {
+                  value: "312+",
+                  label: "Appointments Booked",
+                  sub: "across partner contractors",
+                  color: "#16C05A",
+                },
+                {
+                  value: "30 Days",
+                  label: "Average Time To First Results",
+                  sub: "from launch to first booked job",
+                  color: "#F9FAFB",
+                },
+                {
+                  value: "100%",
+                  label: "Done For You",
+                  sub: "we run ads, AI, and follow up",
+                  color: "#F9FAFB",
+                },
+              ].map((stat, index) => (
+                <div
+                  key={stat.label}
+                  style={{
+                    padding: "22px 20px 18px",
+                    borderRight:
+                      index < 2 ? "1px solid rgba(31,41,55,0.9)" : "none",
+                    textAlign: "center",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 26,
+                      fontWeight: 900,
+                      color: stat.color,
+                      marginBottom: 6,
+                    }}
+                  >
+                    {stat.value}
+                      </div>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      color: "#E5E7EB",
+                      fontWeight: 600,
+                      marginBottom: 4,
+                    }}
+                  >
+                    {stat.label}
+                    </div>
+                  <div style={{ fontSize: 12, color: "#9CA3AF" }}>{stat.sub}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+        </section>
+
+        {/* WHAT WE DO */}
+        <section
+          id="services"
+          style={{
+            padding: "80px 0",
+          }}
+        >
+          <div style={{ textAlign: "center", marginBottom: 40 }}>
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "6px 14px",
+                borderRadius: 999,
+                backgroundColor: "rgba(22,192,90,0.08)",
+                border: "1px solid rgba(22,192,90,0.25)",
+                fontSize: 11,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                color: "#16C05A",
+              }}
+            >
+              What We Do
                 </span>
-                <span className="text-[#A0AEC0]">/mo</span>
-              </p>
-              <ul className="mt-6 space-y-3">
-                {plan.features.map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-[#A0AEC0]">
-                    <span className="text-[#3B6EF8]">✓</span>
-                    {f}
+            <h2
+              style={{
+                marginTop: 16,
+                fontSize: 48,
+                fontWeight: 900,
+                lineHeight: 1.1,
+              }}
+            >
+              Everything You Need to Fill Your Calendar
+            </h2>
+            <p
+              style={{
+                marginTop: 12,
+                fontSize: 15,
+                color: "#9CA3AF",
+                maxWidth: 560,
+                marginLeft: "auto",
+                marginRight: "auto",
+              }}
+            >
+              One system that handles ads, follow up, and booking so you can
+              focus on running the jobs.
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 24,
+              paddingLeft: 0,
+              paddingRight: 0,
+            }}
+          >
+            {/* Row 1: three equal cards */}
+            <div
+              className="bento-grid"
+              style={{
+                paddingLeft: 0,
+                paddingRight: 0,
+              }}
+            >
+              {/* Facebook and Instagram Ads */}
+              <div
+                style={{
+                  backgroundColor: "#0D1117",
+                  border: "1px solid #1E293B",
+                  borderRadius: 20,
+                  padding: 32,
+                  transition: "all 0.3s ease",
+                  wordBreak: "normal",
+                  whiteSpace: "normal",
+                  overflow: "visible",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLDivElement).style.borderColor =
+                    "#3B82F6";
+                  (e.currentTarget as HTMLDivElement).style.boxShadow =
+                    "0 20px 50px rgba(59,130,246,0.35)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLDivElement).style.borderColor =
+                    "#1E293B";
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
+                }}
+              >
+                <div
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: 16,
+                    backgroundColor: "rgba(59,130,246,0.15)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 26,
+                  }}
+                >
+                  📣
+                        </div>
+                <h3
+                  style={{
+                    marginTop: 20,
+                    fontSize: 20,
+                    fontWeight: 800,
+                    wordBreak: "normal",
+                    whiteSpace: "normal",
+                    overflow: "visible",
+                  }}
+                >
+                  Facebook and Instagram Ads
+                </h3>
+                <p
+                  style={{
+                    marginTop: 10,
+                    fontSize: 15,
+                    color: "#94A3B8",
+                    lineHeight: 1.6,
+                    whiteSpace: "normal",
+                    overflow: "visible",
+                  }}
+                >
+                  Proven campaigns that reach motivated homeowners in your exact
+                  service areas.
+                </p>
+              </div>
+
+              {/* AI Lead Follow Up */}
+              <div
+                style={{
+                  backgroundColor: "#0D1117",
+                  border: "1px solid #1E293B",
+                  borderRadius: 20,
+                  padding: 32,
+                  transition: "all 0.3s ease",
+                  wordBreak: "normal",
+                  whiteSpace: "normal",
+                  overflow: "visible",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLDivElement).style.borderColor =
+                    "#F59E0B";
+                  (e.currentTarget as HTMLDivElement).style.boxShadow =
+                    "0 20px 50px rgba(245,158,11,0.35)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLDivElement).style.borderColor =
+                    "#1E293B";
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
+                }}
+              >
+                <div
+                    style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: 16,
+                    backgroundColor: "rgba(245,158,11,0.18)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 26,
+                  }}
+                >
+                  ⚡
+              </div>
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    padding: "4px 10px",
+                    borderRadius: 999,
+                    backgroundColor: "rgba(245,158,11,0.12)",
+                    border: "1px solid rgba(245,158,11,0.5)",
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: "#FBBF24",
+                    marginTop: 14,
+                  }}
+                >
+                  Under 60 Seconds
+            </div>
+                <h3
+                  style={{
+                    marginTop: 14,
+                    fontSize: 20,
+                    fontWeight: 800,
+                    wordBreak: "normal",
+                    whiteSpace: "normal",
+                    overflow: "visible",
+                  }}
+                >
+                  AI Lead Follow Up
+                </h3>
+                <p
+                  style={{
+                    marginTop: 10,
+                    fontSize: 15,
+                    color: "#94A3B8",
+                    lineHeight: 1.6,
+                    whiteSpace: "normal",
+                    overflow: "visible",
+                  }}
+                >
+                  Smart sequences hit every new lead by text and email in under
+                  a minute so you never lose the best jobs to slow response times.
+                </p>
+              </div>
+
+              {/* Human Appointment Setters */}
+              <div
+                style={{
+                  backgroundColor: "#0D1117",
+                  border: "1px solid #1E293B",
+                  borderRadius: 20,
+                  padding: 32,
+                  transition: "all 0.3s ease",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  wordBreak: "normal",
+                  whiteSpace: "normal",
+                  overflow: "visible",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLDivElement).style.borderColor =
+                    "#16C05A";
+                  (e.currentTarget as HTMLDivElement).style.boxShadow =
+                    "0 20px 50px rgba(22,192,90,0.4)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLDivElement).style.borderColor =
+                    "#1E293B";
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
+                }}
+              >
+                <div>
+                  <div
+                    style={{
+                      width: 56,
+                      height: 56,
+                      borderRadius: 16,
+                      backgroundColor: "rgba(22,192,90,0.18)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 26,
+                    }}
+                  >
+                    📞
+              </div>
+                  <div
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      padding: "4px 10px",
+                      borderRadius: 999,
+                      backgroundColor: "rgba(22,192,90,0.12)",
+                      border: "1px solid rgba(22,192,90,0.6)",
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: "#16C05A",
+                      marginTop: 14,
+                    }}
+                  >
+                    Done For You
+                    </div>
+                  <h3
+                    style={{
+                      marginTop: 14,
+                      fontSize: 20,
+                      fontWeight: 800,
+                      wordBreak: "normal",
+                      whiteSpace: "normal",
+                      overflow: "visible",
+                    }}
+                  >
+                    Human Appointment Setters
+                  </h3>
+                  <p
+                    style={{
+                      marginTop: 10,
+                      fontSize: 15,
+                      color: "#94A3B8",
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    Real people qualify and book appointments into your calendar
+                    so your sales team talks only with serious homeowners.
+                  </p>
+                      </div>
+                <div
+                  style={{
+                    marginTop: 18,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    fontSize: 12,
+                    color: "#9CA3AF",
+                  }}
+                >
+                  <span>Last 30 days</span>
+                  <span style={{ color: "#16C05A", fontWeight: 700 }}>
+                    312+ appointments booked
+                      </span>
+                    </div>
+                  </div>
+              </div>
+
+            {/* Row 2: two wide cards */}
+            <div
+              className="bento-grid"
+              style={{
+                gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                paddingLeft: 0,
+                paddingRight: 0,
+              }}
+            >
+              {/* Exclusive Leads */}
+              <div
+                      style={{
+                  backgroundColor: "#0D1117",
+                  border: "1px solid #1E293B",
+                  borderRadius: 20,
+                  padding: 32,
+                  transition: "all 0.3s ease",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLDivElement).style.borderColor =
+                    "#A855F7";
+                  (e.currentTarget as HTMLDivElement).style.boxShadow =
+                    "0 20px 50px rgba(168,85,247,0.35)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLDivElement).style.borderColor =
+                    "#1E293B";
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
+                }}
+              >
+                <div
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: 16,
+                    backgroundColor: "rgba(168,85,247,0.18)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 26,
+                  }}
+                >
+                  🔒
+                  </div>
+                    <div
+                      style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    padding: "4px 10px",
+                    borderRadius: 999,
+                    backgroundColor: "rgba(168,85,247,0.12)",
+                    border: "1px solid rgba(168,85,247,0.6)",
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: "#E9D5FF",
+                    marginTop: 14,
+                  }}
+                >
+                  Never shared
+                  </div>
+                <h3
+                  style={{
+                    marginTop: 14,
+                    fontSize: 20,
+                    fontWeight: 800,
+                    wordBreak: "normal",
+                    whiteSpace: "normal",
+                    overflow: "visible",
+                  }}
+                >
+                  100% Exclusive Leads
+                </h3>
+                <p
+                  style={{
+                    marginTop: 10,
+                    fontSize: 15,
+                    color: "#94A3B8",
+                    lineHeight: 1.6,
+                    whiteSpace: "normal",
+                    overflow: "visible",
+                  }}
+                >
+                  Every homeowner you pay for is yours alone. No more racing
+                  against four other contractors for the same job.
+                </p>
+      </div>
+
+              {/* No Long Term Contracts */}
+              <div
+                style={{
+                  backgroundColor: "#0D1117",
+                  border: "1px solid #1E293B",
+                  borderRadius: 20,
+                  padding: 32,
+                  transition: "all 0.3s ease",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLDivElement).style.borderColor =
+                    "#EF4444";
+                  (e.currentTarget as HTMLDivElement).style.boxShadow =
+                    "0 20px 50px rgba(239,68,68,0.35)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLDivElement).style.borderColor =
+                    "#1E293B";
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
+                }}
+              >
+                <div
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: 16,
+                    backgroundColor: "rgba(239,68,68,0.18)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 26,
+                  }}
+                >
+                  🛡️
+                </div>
+                <h3
+                  style={{
+                    marginTop: 20,
+                    fontSize: 20,
+                    fontWeight: 800,
+                    wordBreak: "normal",
+                    whiteSpace: "normal",
+                    overflow: "visible",
+                  }}
+                >
+                  No Long Term Contracts
+                </h3>
+                <p
+                  style={{
+                    marginTop: 10,
+                    fontSize: 15,
+                    color: "#94A3B8",
+                    lineHeight: 1.6,
+                    whiteSpace: "normal",
+                    overflow: "visible",
+                  }}
+                >
+                  Stay because the system consistently fills your calendar, not
+                  because your signature is trapped in a twelve month renewal.
+                </p>
+              </div>
+              </div>
+
+            {/* Row 3: full width 30 day guarantee */}
+            <div
+              style={{
+                background:
+                  "linear-gradient(135deg, rgba(22,192,90,0.28), rgba(15,23,42,0.98))",
+                borderRadius: 20,
+                border: "1px solid rgba(22,192,90,0.4)",
+                padding: 32,
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                gap: 24,
+                justifyContent: "space-between",
+                transition: "all 0.3s ease",
+                wordBreak: "normal",
+                whiteSpace: "normal",
+                overflow: "visible",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLDivElement).style.boxShadow =
+                  "0 24px 80px rgba(22,192,90,0.45)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 16,
+                  flex: 1,
+                  minWidth: 260,
+                }}
+              >
+                <div
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: 16,
+                    backgroundColor: "#022C22",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 28,
+                  }}
+                >
+                  ✅
+          </div>
+                <div style={{ textAlign: "left" }}>
+                  <h3
+                    style={{
+                      fontSize: 20,
+                      fontWeight: 800,
+                      marginBottom: 4,
+                    }}
+                  >
+                    30 Day Results Guarantee
+                  </h3>
+                  <p
+                    style={{
+                      fontSize: 15,
+                      color: "#E5E7EB",
+                      lineHeight: 1.6,
+                      margin: 0,
+                    }}
+                  >
+                    See qualified appointments in the first thirty days or{" "}
+                    <span style={{ color: "#16C05A", fontWeight: 700 }}>
+                      we work free until we hit the mark
+                    </span>
+                    .
+                  </p>
+                </div>
+              </div>
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  window.location.href = "/book-a-call";
+                }
+              }}
+                style={{
+                  backgroundColor: "#16C05A",
+                  color: "#000000",
+                  border: "none",
+                  borderRadius: 999,
+                  padding: "11px 24px",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                  boxShadow: "0 0 26px rgba(22,192,90,0.7)",
+                  transition: "all 0.3s ease",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.transform =
+                    "translateY(-1px)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.transform =
+                    "translateY(0)";
+                }}
+              >
+                Learn How The Guarantee Works
+            </button>
+          </div>
+                  </div>
+        </section>
+
+        {/* WHY VOXFLOW */}
+        <section id="about" style={{ padding: "10px 0 70px" }}>
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "6px 14px",
+                borderRadius: 999,
+                backgroundColor: "rgba(22,192,90,0.08)",
+                border: "1px solid rgba(22,192,90,0.25)",
+                fontSize: 11,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                color: "#16C05A",
+              }}
+            >
+              Why Voxflow
+                  </span>
+            <h2
+              style={{
+                marginTop: 18,
+                fontSize: "clamp(26px, 3vw, 34px)",
+                fontWeight: 900,
+              }}
+            >
+              The Old Way Is Broken. Here Is What Actually Works.
+        </h2>
+            </div>
+
+          <div className="why-grid">
+            {/* Problem column */}
+              <div
+                style={{
+                borderRadius: 20,
+                border: "1px solid rgba(248,113,113,0.4)",
+                background:
+                  "radial-gradient(circle at top, rgba(127,29,29,0.6), #020617)",
+                padding: 22,
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: 17,
+                  fontWeight: 800,
+                  color: "#FCA5A5",
+                  marginBottom: 14,
+                }}
+              >
+                The Problem
+              </h3>
+              <ul
+                style={{
+                  listStyle: "none",
+                  margin: 0,
+                  padding: 0,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 10,
+                  fontSize: 13,
+                  color: "#FEE2E2",
+                }}
+              >
+                {[
+                  "Door knocking does not scale and depends on the weather and your energy.",
+                  "Lead marketplaces sell the same homeowner to four or five contractors.",
+                  "Slow follow up lets the best jobs go to whoever calls first.",
+                  "SEO takes six to twelve months before you see predictable results.",
+                ].map((item) => (
+                  <li
+                    key={item}
+                    style={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: 8,
+                    }}
+                  >
+                <span
+                      style={{
+                        width: 18,
+                        height: 18,
+                        borderRadius: "50%",
+                        backgroundColor: "rgba(248,113,113,0.2)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 11,
+                      }}
+                    >
+                      ✕
+                    </span>
+                    <span>{item}</span>
                   </li>
                 ))}
               </ul>
-              <a
-                href="#"
-                className={`mt-8 block w-full rounded-full py-3 text-center font-bold transition-all duration-[400ms] hover:brightness-110 hover:scale-[1.02] ${
-                  plan.outline
-                    ? "border border-[#1E293B] text-white hover:border-[#3B6EF8]"
-                    : "bg-gradient-to-r from-[#3B6EF8] to-[#5B82FA] text-white"
-                }`}
-              >
-                {plan.cta}
-              </a>
             </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
-function IntegrationsSection() {
-  const { ref, isInView } = useInView();
-  const stagger = (i: number) => ({
-    opacity: isInView ? 1 : 0,
-    transform: isInView ? "translateY(0)" : "translateY(30px)",
-    transition: `opacity 400ms cubic-bezier(0.16, 1, 0.3, 1) ${i * 100}ms, transform 400ms cubic-bezier(0.16, 1, 0.3, 1) ${i * 100}ms`,
-  });
-
-  const integrations = [
-    "Gmail",
-    "LinkedIn",
-    "Calendly",
-    "Twilio",
-    "Instantly",
-    "Apify",
-    "Stripe",
-    "Slack",
-  ];
-
-  const angleStep = (2 * Math.PI) / 8;
-  const radius = 120;
-
-  return (
-    <section id="integrations" className="bg-[#000000] py-24 px-6" ref={ref}>
-      <div className="mx-auto max-w-4xl">
-        <div style={stagger(0)} className="flex justify-center">
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-[#1E293B] bg-[#0D1117] px-4 py-2 text-sm text-[#A0AEC0]">
-            <Link2 className="h-4 w-4 text-[#3B6EF8]" />
-            Integration
-          </div>
-        </div>
-        <h2
-          style={stagger(1)}
-          className="font-syne text-center text-3xl font-bold text-white md:text-4xl"
-        >
-          Built to Work Perfectly With Your Existing Tools
-        </h2>
-        <p
-          style={stagger(2)}
-          className="mx-auto mt-4 max-w-xl text-center text-[#A0AEC0]"
-        >
-          Connect the tools your outreach stack already depends on.
-        </p>
-        <div style={stagger(3)} className="relative mx-auto mt-20 flex h-[380px] w-full max-w-lg items-center justify-center">
-          <svg
-            className="absolute inset-0 h-full w-full animate-spin-slow"
-            style={{ animationDuration: "60s" }}
-          >
-            <defs>
-              <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#3B6EF8" />
-                <stop offset="100%" stopColor="#8B5CF6" />
-              </linearGradient>
-            </defs>
-            {integrations.map((_, i) => {
-              const angle = i * angleStep - Math.PI / 2;
-              const x = 200 + radius * Math.cos(angle);
-              const y = 190 + radius * Math.sin(angle);
-              return (
-                <line
-                  key={i}
-                  x1="50%"
-                  y1="50%"
-                  x2={x}
-                  y2={y}
-                  stroke="url(#lineGrad)"
-                  strokeWidth="1"
-                  strokeDasharray="4 4"
-                  className="animate-dash-flow"
-                />
-              );
-            })}
-          </svg>
-          <div className="absolute flex h-24 w-24 items-center justify-center rounded-full bg-[#0D1117] border-2 border-[#3B6EF8] shadow-lg shadow-[#3B6EF8]/40">
-            <span className="font-syne text-2xl font-extrabold text-[#3B6EF8]">Z</span>
-          </div>
-          {integrations.map((name, i) => {
-            const angle = i * angleStep - Math.PI / 2;
-            const x = radius * Math.cos(angle);
-            const y = radius * Math.sin(angle);
-            return (
-              <div
-                key={name}
-                className="absolute flex h-14 w-14 items-center justify-center rounded-xl border border-[#1E293B] bg-[#0D1117] text-[#3B6EF8] transition-all duration-[400ms] hover:-translate-y-1 hover:border-[#3B6EF8] hover:shadow-lg hover:shadow-[#3B6EF8]/20"
+            {/* Solution column */}
+            <div
+                  style={{
+                borderRadius: 20,
+                border: "1px solid rgba(22,192,90,0.45)",
+                background:
+                  "radial-gradient(circle at top, rgba(22,192,90,0.6), #020617)",
+                padding: 22,
+              }}
+            >
+              <h3
                 style={{
-                  left: `calc(50% + ${x}px - 28px)`,
-                  top: `calc(50% + ${y}px - 28px)`,
+                  fontSize: 17,
+                  fontWeight: 800,
+                  color: "#BBF7D0",
+                  marginBottom: 14,
                 }}
               >
-                <span className="text-xs font-bold">{name.slice(0, 2)}</span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
+                The Voxflow Solution
+              </h3>
+              <ul
+                style={{
+                  listStyle: "none",
+                  margin: 0,
+                  padding: 0,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 10,
+                  fontSize: 13,
+                  color: "#DCFCE7",
+                }}
+              >
+                {[
+                  "Facebook ads reach homeowners early so you win the conversation first.",
+                  "Every lead is exclusive to your company and never shared with competitors.",
+                  "AI responds in under sixty seconds and keeps following up until they book.",
+                  "Our system is built to show clear results in the first thirty days.",
+                ].map((item) => (
+                  <li
+                    key={item}
+                    style={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: 8,
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 18,
+                        height: 18,
+                        borderRadius: "50%",
+                        backgroundColor: "rgba(22,192,90,0.24)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 11,
+                      }}
+                    >
+                      ✓
+                    </span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+                    </div>
+                    </div>
+        </section>
 
-function TestimonialsSection() {
-  const { ref, isInView } = useInView();
-  const stagger = (i: number) => ({
-    opacity: isInView ? 1 : 0,
-    transform: isInView ? "translateY(0)" : "translateY(30px)",
-    transition: `opacity 400ms cubic-bezier(0.16, 1, 0.3, 1) ${i * 100}ms, transform 400ms cubic-bezier(0.16, 1, 0.3, 1) ${i * 100}ms`,
-  });
-
-  const testimonials = [
-    {
-      quote:
-        "Zyvro booked us 14 appointments in our first week. The AI setter replies like a real human.",
-      name: "James K.",
-      role: "Marketing Agency Owner",
-      initials: "JK",
-    },
-    {
-      quote:
-        "We replaced 3 tools with Zyvro and cut our outreach cost by 60% while 3x-ing reply rates.",
-      name: "Priya S.",
-      role: "B2B Consultant",
-      initials: "PS",
-    },
-    {
-      quote:
-        "The onboarding chat blew my mind. Told it my ICP and had 200 leads ready in under 5 minutes.",
-      name: "Carlos M.",
-      role: "SMMA Founder",
-      initials: "CM",
-    },
-  ];
-
-  return (
-    <section id="testimonials" className="bg-[#000000] py-24 px-6" ref={ref}>
-      <div className="mx-auto max-w-6xl">
-        <div style={stagger(0)} className="flex justify-center">
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-[#1E293B] bg-[#0D1117] px-4 py-2 text-sm text-[#A0AEC0]">
-            <Star className="h-4 w-4 text-[#3B6EF8]" />
-            Testimonial
-          </div>
-        </div>
-        <h2
-          style={stagger(1)}
-          className="font-syne text-center text-3xl font-bold text-white md:text-4xl"
-        >
-          Our User Stories
-        </h2>
-        <p
-          style={stagger(2)}
-          className="mx-auto mt-4 max-w-xl text-center text-[#A0AEC0]"
-        >
-          See how agencies and service businesses are landing clients on
-          autopilot with Zyvro.
-        </p>
-        <div className="mt-16 flex gap-8 overflow-x-auto pb-4 md:grid md:grid-cols-3 md:overflow-visible">
-          {testimonials.map((t, i) => (
-            <div
-              key={t.name}
-              style={stagger(3 + i)}
-              className="min-w-[300px] flex-1 rounded-2xl border border-[#1E293B] bg-[#0D1117] p-8 transition-all duration-[400ms] hover:-translate-y-1 hover:shadow-lg hover:shadow-[#3B6EF8]/20"
+        {/* TESTIMONIAL VIDEO */}
+        <section id="video" style={{ padding: "80px 0" }}>
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "6px 14px",
+                borderRadius: 999,
+                backgroundColor: "rgba(22,192,90,0.08)",
+                border: "1px solid rgba(22,192,90,0.25)",
+                fontSize: 11,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                color: "#16C05A",
+              }}
             >
-              <p className="text-4xl font-serif text-[#3B6EF8]/30">&ldquo;</p>
-              <div className="flex gap-1 text-[#3B6EF8]">
-                {[...Array(5)].map((_, j) => (
-                  <Star key={j} className="h-4 w-4 fill-current" />
+              Client Results
+            </span>
+            <h2
+              style={{
+                marginTop: 18,
+                fontSize: "clamp(28px, 3vw, 34px)",
+                fontWeight: 900,
+              }}
+            >
+              See Real Results From Real Contractors
+            </h2>
+            <p
+              style={{
+                marginTop: 10,
+                fontSize: 15,
+                color: "#9CA3AF",
+                maxWidth: 520,
+                marginLeft: "auto",
+                marginRight: "auto",
+                lineHeight: 1.7,
+              }}
+            >
+              Hear directly from a roofing business owner about their experience
+              with Voxflow Media.
+            </p>
+          </div>
+
+          <div
+            className="testimonial-layout"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
+              gap: 48,
+              alignItems: "stretch",
+            }}
+          >
+            {/* Left column - video */}
+            <div>
+              <div
+                style={{
+                  width: "100%",
+                  maxWidth: 280,
+                  borderRadius: 20,
+                  border: "1px solid #1E293B",
+                  backgroundColor: "#020617",
+                  padding: 10,
+                  boxShadow: "0 24px 60px rgba(0,0,0,0.9)",
+                  margin: "0 auto",
+                }}
+              >
+                <div
+                  style={{
+                    borderRadius: 20,
+                    overflow: "hidden",
+                    backgroundColor: "#000000",
+                    aspectRatio: "9 / 16",
+                  }}
+                >
+                  <video
+                    src="/testimonial.mp4"
+                    controls
+                    playsInline
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      display: "block",
+                      objectFit: "cover",
+                      backgroundColor: "#000000",
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div
+                style={{
+                  marginTop: 16,
+                  borderRadius: 18,
+                  border: "1px solid #1E293B",
+                  backgroundColor: "#020617",
+                  padding: 16,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 14,
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: "999px",
+                      backgroundColor: "#16C05A",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontWeight: 800,
+                      color: "#000000",
+                    }}
+                  >
+                    R
+                  </div>
+                  <div>
+                    <div
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 700,
+                        color: "#F9FAFB",
+                      }}
+                    >
+                      Roofing Business Owner
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 12,
+                        color: "#94A3B8",
+                      }}
+                    >
+                      Voxflow Media Client
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    padding: "4px 10px",
+                    borderRadius: 999,
+                    border: "1px solid rgba(22,192,90,0.4)",
+                    backgroundColor: "rgba(22,192,90,0.16)",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    color: "#16C05A",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Verified Client
+                </div>
+              </div>
+            </div>
+
+            {/* Right column - quote, stats, CTA */}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+              }}
+            >
+              <div
+                style={{
+                  backgroundColor: "#0D1117",
+                  borderRadius: 16,
+                  padding: 36,
+                  border: "1px solid #1E293B",
+                  borderLeft: "4px solid #16C05A",
+                  boxShadow: "0 18px 50px rgba(0,0,0,0.8)",
+                  minHeight: 260,
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 32,
+                    color: "#16C05A",
+                    marginBottom: 12,
+                  }}
+                >
+                  “
+                </div>
+                <p
+                  style={{
+                    fontSize: 18,
+                    fontWeight: 700,
+                    color: "#F9FAFB",
+                    lineHeight: 1.5,
+                    marginBottom: 18,
+                  }}
+                >
+                  Voxflow filled my calendar with qualified roofing leads within
+                  the first 2 weeks. I stopped chasing and started closing.
+                </p>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    fontSize: 14,
+                    marginTop: "auto",
+                  }}
+                >
+                  <span style={{ color: "#16C05A" }}>★★★★★</span>
+                  <span style={{ color: "#16C05A", fontWeight: 600 }}>
+                    5.0 Exceptional Results
+                  </span>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  marginTop: 20,
+                  display: "grid",
+                  gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                  gap: 14,
+                }}
+              >
+                {[
+                  {
+                    value: "47",
+                    label: "Appointments",
+                    sub: "In first month",
+                  },
+                  {
+                    value: "8x",
+                    label: "ROI",
+                    sub: "Return on spend",
+                  },
+                  {
+                    value: "2 Wks",
+                    label: "To First Lead",
+                    sub: "From day one",
+                  },
+                ].map((stat) => (
+                  <div
+                    key={stat.label}
+                    style={{
+                      backgroundColor: "#0D1117",
+                      borderRadius: 12,
+                      border: "1px solid #1E293B",
+                      padding: 20,
+                      textAlign: "center",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 22,
+                        fontWeight: 800,
+                        color: "#16C05A",
+                        marginBottom: 4,
+                      }}
+                    >
+                      {stat.value}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: "#E5E7EB",
+                        marginBottom: 2,
+                      }}
+                    >
+                      {stat.label}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 12,
+                        color: "#94A3B8",
+                      }}
+                    >
+                      {stat.sub}
+                    </div>
+                  </div>
                 ))}
               </div>
-              <p className="mt-4 text-[#A0AEC0]">&ldquo;{t.quote}&rdquo;</p>
-              <div className="mt-6 flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#3B6EF8]/20 font-syne text-sm font-bold text-[#3B6EF8]">
-                  {t.initials}
-                </div>
-                <div>
-                  <p className="font-semibold text-white">{t.name}</p>
-                  <p className="text-sm text-[#A0AEC0]">{t.role}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
-function FinalCTASection() {
-  const { ref, isInView } = useInView();
-  const style = {
-    opacity: isInView ? 1 : 0,
-    transform: isInView ? "translateY(0)" : "translateY(30px)",
-    transition: "opacity 400ms cubic-bezier(0.16, 1, 0.3, 1), transform 400ms cubic-bezier(0.16, 1, 0.3, 1)",
-  };
-
-  return (
-    <section
-      id="contact"
-      className="relative overflow-hidden bg-[#0D1117] py-24 px-6"
-      ref={ref}
-    >
-      <div
-        className="pointer-events-none absolute inset-0 opacity-30"
-        style={{
-          background: "radial-gradient(ellipse at 50% 100%, rgba(59,110,248,0.5) 0%, transparent 60%)",
-        }}
-      />
-      <div className="relative z-10 mx-auto max-w-3xl text-center">
-        <div style={style} className="flex justify-center">
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-[#1E293B] bg-[#0D1117] px-4 py-2 text-sm text-[#A0AEC0]">
-            <User className="h-4 w-4 text-[#3B6EF8]" />
-            Sign Up
-          </div>
-        </div>
-        <h2
-          style={style}
-          className="font-syne text-3xl font-extrabold text-white md:text-5xl"
-        >
-          Start Getting Clients Tonight
-        </h2>
-        <p style={style} className="mt-4 text-lg text-[#A0AEC0]">
-          No credit card required. Set up in under 5 minutes.
-        </p>
-        <div style={style} className="mt-10">
-          <a
-            href="#pricing"
-            className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#3B6EF8] to-[#5B82FA] px-12 py-4 text-lg font-bold text-white shadow-lg shadow-[#3B6EF8]/30 transition-all duration-[400ms] hover:brightness-110 hover:scale-[1.02]"
-          >
-            Get Started
-          </a>
-        </div>
-        <div
-          className="mt-16 mx-auto max-w-md rounded-2xl border border-[#1E293B] bg-[#0D1117] p-[1px]"
-          style={{
-            ...style,
-            background: "linear-gradient(135deg, #3B6EF8, #8B5CF6)",
-            transform: isInView ? "perspective(1000px) rotateX(5deg) translateY(0)" : "perspective(1000px) rotateX(5deg) translateY(30px)",
-          }}
-        >
-          <div className="overflow-hidden rounded-[15px] bg-[#0D1117] p-4">
-            <div className="flex gap-1.5 pb-2">
-              <div className="h-2 w-2 rounded-full bg-[#FF5F57]" />
-              <div className="h-2 w-2 rounded-full bg-[#FEBC2E]" />
-              <div className="h-2 w-2 rounded-full bg-[#28C840]" />
-            </div>
-            <div className="rounded-lg border border-[#3B6EF8]/50 bg-[#1E293B]/30 p-4">
-              <p className="text-sm text-[#A0AEC0]">Describe your ideal client...</p>
-              <p className="mt-2 text-white">AI is finding 200+ leads for you.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function FooterSection() {
-  const [email, setEmail] = useState("");
-
-  return (
-    <footer className="relative bg-[#000000] pt-20 pb-8 px-6 overflow-hidden">
-      <div className="mx-auto max-w-6xl">
-        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded bg-[#3B6EF8] font-syne text-lg font-bold text-white">
-                Z
-              </div>
-              <span className="font-syne text-xl font-bold text-white">Zyvro</span>
-            </div>
-            <p className="mt-4 text-sm text-[#A0AEC0]">
-              Automate client acquisition. Book appointments on autopilot.
-            </p>
-            <div className="mt-4 flex gap-2">
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 rounded-lg border border-[#1E293B] bg-[#0D1117] px-4 py-2 text-sm text-white placeholder:text-[#A0AEC0] focus:border-[#3B6EF8] focus:outline-none"
-              />
               <button
                 type="button"
-                className="rounded-lg bg-[#3B6EF8] px-4 py-2 text-sm font-medium text-white transition-all hover:brightness-110"
+                onClick={() => {
+                  if (typeof window !== "undefined") {
+                    window.location.href = "/book-a-call";
+                  }
+                }}
+                style={{
+                  marginTop: 22,
+                  width: "100%",
+                  borderRadius: 12,
+                  border: "none",
+                  padding: 18,
+                  backgroundColor: "#16C05A",
+                  color: "#000000",
+                  fontSize: 16,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  boxShadow: "0 0 30px rgba(22,192,90,0.6)",
+                  transition: "transform 0.15s ease, filter 0.15s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-1px)";
+                  e.currentTarget.style.filter = "brightness(1.05)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.filter = "none";
+                }}
               >
-                Subscribe
+                Get Results Like This Book a Free Call →
               </button>
             </div>
           </div>
-          <div>
-            <h4 className="font-syne font-bold text-white">Navigation</h4>
-            <ul className="mt-4 space-y-2 text-sm text-[#A0AEC0]">
-              {["Home", "About", "Features", "Pricing", "Blog", "Contact"].map(
-                (item) => (
-                  <li key={item}>
-                    <a href="#" className="hover:text-white">{item}</a>
-                  </li>
-                )
-              )}
-            </ul>
+        </section>
+
+        {/* SCROLLING REVIEWS */}
+        <section style={{ padding: "10px 0 70px" }}>
+          <div style={{ textAlign: "center", marginBottom: 26 }}>
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "6px 14px",
+                borderRadius: 999,
+                backgroundColor: "rgba(22,192,90,0.08)",
+                border: "1px solid rgba(22,192,90,0.25)",
+                fontSize: 11,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                color: "#16C05A",
+              }}
+            >
+              What Contractors Say
+            </span>
+            <h2
+              style={{
+                marginTop: 18,
+                fontSize: "clamp(24px, 3vw, 30px)",
+                fontWeight: 900,
+              }}
+            >
+              Trusted by Home Improvement Companies Across the US
+            </h2>
           </div>
-          <div>
-            <h4 className="font-syne font-bold text-white">Legal</h4>
-            <ul className="mt-4 space-y-2 text-sm text-[#A0AEC0]">
-              {["Privacy Policy", "Terms", "License", "Changelog"].map(
-                (item) => (
-                  <li key={item}>
-                    <a href="#" className="hover:text-white">{item}</a>
-                  </li>
-                )
-              )}
-            </ul>
+
+          <div
+            style={{
+              borderRadius: 22,
+              border: "1px solid #1E293B",
+              backgroundColor: "#020617",
+              padding: "16px 0",
+              overflow: "hidden",
+            }}
+          >
+            {/* Row 1 */}
+            <div
+              className="marquee-track reviews-row"
+              style={{ marginBottom: 10 }}
+            >
+              {[...reviewsRow1, ...reviewsRow1].map((review, idx) => (
+                <div
+                  key={`${review.name}-${idx}`}
+        style={{
+                    width: 260,
+                    borderRadius: 18,
+                    border: "1px solid #1E293B",
+                    backgroundColor: "#020617",
+                    padding: 14,
+                  }}
+                >
+                  <div style={{ fontSize: 12, marginBottom: 6 }}>
+                    <span style={{ color: "#FBBF24", marginRight: 4 }}>
+                      ★★★★★
+                    </span>
           </div>
-          <div>
-            <h4 className="font-syne font-bold text-white">Contact</h4>
-            <ul className="mt-4 space-y-2 text-sm text-[#A0AEC0]">
-              <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4" /> hello@zyvro.com
-              </li>
-              <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4" /> +1 (555) 000-0000
-              </li>
-              <li className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" /> San Francisco, CA
-              </li>
-            </ul>
+                  <p
+                    style={{
+                      fontSize: 13,
+                      color: "#E5E7EB",
+                      lineHeight: 1.6,
+                      marginBottom: 8,
+                    }}
+                  >
+                    {review.text}
+                  </p>
+                  <div
+          style={{
+                      fontSize: 12,
+                      color: "#9CA3AF",
+                    }}
+                  >
+                    <strong style={{ color: "#F9FAFB" }}>{review.name}</strong>{" "}
+                    · {review.company} · {review.trade}
+            </div>
+            </div>
+              ))}
           </div>
-        </div>
-        <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-[#1E293B] pt-8 md:flex-row">
-          <p className="text-sm text-[#A0AEC0]">
-            © 2025 Zyvro. All rights reserved.
-          </p>
-          <div className="flex gap-4">
-            {["Facebook", "Instagram", "X", "LinkedIn"].map((name) => (
-              <a
-                key={name}
-                href="#"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-[#1E293B] text-[#A0AEC0] transition-all hover:border-[#3B6EF8] hover:bg-[#3B6EF8] hover:text-white"
-                aria-label={name}
-              >
-                <span className="text-xs font-bold">{name.slice(0, 1)}</span>
-              </a>
-            ))}
+
+            {/* Row 2 */}
+            <div className="marquee-track-reverse reviews-row">
+              {[...reviewsRow2, ...reviewsRow2].map((review, idx) => (
+                <div
+                  key={`${review.name}-${idx}`}
+                  style={{
+                    width: 260,
+                    borderRadius: 18,
+                    border: "1px solid #1E293B",
+                    backgroundColor: "#020617",
+                    padding: 14,
+                  }}
+                >
+                  <div style={{ fontSize: 12, marginBottom: 6 }}>
+                    <span style={{ color: "#FBBF24", marginRight: 4 }}>
+                      ★★★★★
+              </span>
+            </div>
+                  <p
+                    style={{
+                      fontSize: 13,
+                      color: "#E5E7EB",
+                      lineHeight: 1.6,
+                      marginBottom: 8,
+                    }}
+                  >
+                    {review.text}
+                  </p>
+                  <div
+                    style={{
+                      fontSize: 12,
+                      color: "#9CA3AF",
+                    }}
+                  >
+                    <strong style={{ color: "#F9FAFB" }}>{review.name}</strong>{" "}
+                    · {review.company} · {review.trade}
+            </div>
           </div>
-        </div>
-      </div>
-      <p
-        className="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 font-syne text-[12vw] font-extrabold text-white opacity-[0.03] whitespace-nowrap"
-        aria-hidden
-      >
-        ZYVRO
-      </p>
-    </footer>
+              ))}
+          </div>
+          </div>
+        </section>
+
+        {/* FINAL CTA */}
+        <section
+          style={{
+            padding: "60px 0 70px",
+          }}
+        >
+          <div
+            className="final-cta"
+            style={{
+              borderRadius: 24,
+              border: "1px solid #1E293B",
+              background:
+                "radial-gradient(circle at top, rgba(22,192,90,0.28), #020617)",
+              padding: "32px 22px",
+              textAlign: "center",
+              boxShadow: "0 40px 120px rgba(0,0,0,0.9)",
+            }}
+          >
+            <h2
+              style={{
+                fontSize: "clamp(26px, 3vw, 34px)",
+                fontWeight: 900,
+                marginBottom: 10,
+              }}
+            >
+              Stop Chasing Leads. Start Showing Up to Booked Jobs.
+            </h2>
+            <p
+              style={{
+                fontSize: 15,
+                color: "#E5E7EB",
+                maxWidth: 520,
+                margin: "0 auto 20px",
+              }}
+            >
+              Book a free strategy call and see how Voxflow can plug into your
+              business to deliver a steady calendar of high quality appointments.
+            </p>
+            <button
+                type="button"
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  window.location.href = "/book-a-call";
+                }
+              }}
+              style={{
+                background:
+                  "radial-gradient(circle at top, rgba(22,192,90,0.6), #16C05A)",
+                color: "black",
+                border: "none",
+                borderRadius: 999,
+                padding: "14px 30px",
+                fontSize: 16,
+                fontWeight: 700,
+                cursor: "pointer",
+                boxShadow:
+                  "0 0 0 1px rgba(22,192,90,0.3), 0 0 60px rgba(22,192,90,0.9)",
+                transition: "transform 0.15s ease, filter 0.15s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.filter = "brightness(1.07)";
+                e.currentTarget.style.transform = "translateY(-1px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.filter = "none";
+                e.currentTarget.style.transform = "translateY(0)";
+              }}
+            >
+              Book Your Free Strategy Call
+            </button>
+            <p
+              style={{
+                fontSize: 13,
+                color: "#9CA3AF",
+                marginTop: 12,
+              }}
+            >
+              If you do not see qualified appointments in the first 30 days we
+              work at no cost until you do.
+            </p>
+                </div>
+        </section>
+      </main>
+
+      <Footer />
+    </div>
   );
 }
+
