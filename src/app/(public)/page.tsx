@@ -349,7 +349,7 @@ export default function HomePage() {
           <div style={{ padding: "8px 4px 4px" }}>
             <button
               type="button"
-              onClick={handleCalendlyClick}
+              onClick={() => (window.location.href = "/book-a-call")}
               style={{
                 width: "100%",
                 backgroundColor: "#16C05A",
