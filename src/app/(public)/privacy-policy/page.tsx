@@ -400,10 +400,10 @@ export default function PrivacyPolicyPage() {
             <br />
             Email:{" "}
             <a
-              href="mailto:support@voxflowmedia.com"
+              href="mailto:voxflowmedia@gmail.com"
               style={{ color: "#93C5FD", textDecoration: "none" }}
             >
-              support@voxflowmedia.com
+              voxflowmedia@gmail.com
             </a>
           </p>
         </section>
