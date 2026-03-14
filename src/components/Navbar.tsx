@@ -184,25 +184,36 @@ export default function Navbar() {
   }
 
   @media (max-width: 768px) {
+    .navbar-pill {
+      left: 16px !important;
+      right: 16px !important;
+      transform: none !important;
+      width: calc(100% - 32px) !important;
+      min-width: unset !important;
+      max-width: unset !important;
+      justify-content: space-between !important;
+    }
+    .nav-center-links {
+      display: none !important;
+    }
+    .nav-mobile-menu {
+      display: flex !important;
+    }
+    .nav-book-btn {
+      display: none !important;
+    }
+    .nav-hamburger {
+      display: flex !important;
+    }
     .vf-navbar {
-      padding: 8px 16px;
-      gap: 16px;
-      width: calc(100% - 32px);
-    }
-    .vf-nav-center {
-      display: none;
-    }
-    .vf-cta {
-      display: none;
-    }
-    .vf-hamburger {
-      display: inline-block;
+      padding: 8px 12px;
+      gap: 12px;
     }
   }
 
   .vf-mobile-menu {
-    position: absolute;
-    top: 70px;
+    position: fixed;
+    top: 80px;
     left: 16px;
     right: 16px;
     background: #0D1117;
@@ -227,9 +238,21 @@ export default function Navbar() {
     background: #1E293B;
     color: #FFFFFF;
   }
+
+  .vf-mobile-cta {
+    background: #16C05A;
+    color: #000000;
+    font-weight: 700;
+    text-align: center;
+    margin-top: 8px;
+  }
+  .vf-mobile-cta:hover {
+    background: #14a84e;
+    color: #000000;
+  }
       `}</style>
 
-      <nav className="vf-navbar">
+      <nav className="vf-navbar navbar-pill">
         {/* Left logo */}
         <Link href="/" className="vf-nav-left">
           <div className="vf-logo-circle">
@@ -249,7 +272,7 @@ export default function Navbar() {
         </Link>
 
         {/* Center links */}
-        <div className="vf-nav-center">
+        <div className="vf-nav-center nav-center-links">
           <Link href="/" className="vf-link">
             Home
           </Link>
@@ -344,13 +367,13 @@ export default function Navbar() {
         </div>
 
         {/* Right */}
-        <div className="vf-nav-right">
-          <Link href="/book-a-call" className="vf-cta">
+        <div className="vf-nav-right nav-mobile-menu">
+          <Link href="/book-a-call" className="vf-cta nav-book-btn">
             Book a Call
           </Link>
           <button
             type="button"
-            className="vf-hamburger"
+            className="vf-hamburger nav-hamburger"
             onClick={() => setMobileMenuOpen((open) => !open)}
           >
             {mobileMenuOpen ? "✕" : "☰"}
@@ -408,6 +431,13 @@ export default function Navbar() {
               onClick={() => setMobileMenuOpen(false)}
             >
               FAQ
+            </Link>
+            <Link
+              href="/book-a-call"
+              className="vf-mobile-link vf-mobile-cta"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Book a Call
             </Link>
           </div>
         )}

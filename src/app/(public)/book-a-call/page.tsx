@@ -36,7 +36,10 @@ export default function BookACallPage() {
           padding: '24px 16px 80px',
         }}
       >
-        <section style={{ textAlign: 'center', marginBottom: 40 }}>
+        <section
+          className="booking-hero"
+          style={{ textAlign: 'center', marginBottom: 40 }}
+        >
           <div
             style={{
               display: 'inline-flex',
@@ -77,6 +80,7 @@ export default function BookACallPage() {
         </section>
 
         <section
+          className="booking-grid"
           style={{
             display: 'grid',
             gap: 32,
@@ -84,6 +88,7 @@ export default function BookACallPage() {
           }}
         >
           <div
+            className="booking-left"
             style={{
               backgroundColor: '#0D1117',
               borderRadius: 20,
@@ -242,13 +247,13 @@ export default function BookACallPage() {
                     backgroundColor: '#0a0a0a',
                     border: '1px solid #1E293B',
                     borderRadius: 12,
-                    padding: 16,
+                    padding: 12,
                     textAlign: 'center',
                   }}
                 >
                   <div
                     style={{
-                      fontSize: 20,
+                      fontSize: 18,
                       fontWeight: 800,
                       color: '#16C05A',
                       marginBottom: 4,
@@ -258,7 +263,7 @@ export default function BookACallPage() {
                   </div>
                   <div
                     style={{
-                      fontSize: 11,
+                      fontSize: 10,
                       color: '#64748B',
                     }}
                   >
@@ -304,6 +309,7 @@ export default function BookACallPage() {
 
             {/* Section 6 - Trust badges */}
             <div
+              className="booking-trust-row"
               style={{
                 marginTop: 24,
                 display: 'flex',
@@ -348,13 +354,44 @@ export default function BookACallPage() {
             <div
               className="calendly-inline-widget"
               data-url="https://calendly.com/voxflowmedia/remodeling-jobs--call"
-              style={{ minWidth: '320px', height: '700px' }}
+              style={{ minWidth: '280px', width: '100%', height: '700px' }}
             />
           </div>
         </section>
       </main>
 
       <Footer />
+      <style>{`
+  @media (max-width: 768px) {
+    .booking-grid {
+      grid-template-columns: 1fr !important;
+      padding: 0 16px !important;
+    }
+    .booking-hero {
+      padding: 100px 16px 40px !important;
+    }
+    .booking-hero h1 {
+      font-size: 32px !important;
+    }
+    .booking-trust-row {
+      flex-direction: column !important;
+      align-items: center !important;
+      gap: 8px !important;
+    }
+    .booking-left {
+      padding: 20px !important;
+    }
+    .calendly-inline-widget {
+      height: 600px !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .booking-hero h1 {
+      font-size: 28px !important;
+    }
+  }
+      `}</style>
     </div>
   );
 }

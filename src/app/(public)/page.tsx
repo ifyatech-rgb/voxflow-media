@@ -1190,7 +1190,7 @@ export default function HomePage() {
                   color: "#16C05A",
                 },
                 {
-                  value: "30 Days",
+                  value: "48-72 Hrs",
                   label: "Average Time To First Results",
                   sub: "from launch to first booked job",
                   color: "#F9FAFB",
