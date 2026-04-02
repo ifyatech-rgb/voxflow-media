@@ -353,8 +353,8 @@ export default function BookACallPage() {
           >
             <div
               className="calendly-inline-widget"
-              data-url="https://calendly.com/voxflowmedia/remodeling-jobs--call"
-              style={{ minWidth: '280px', width: '100%', height: '700px' }}
+              data-url="https://calendly.com/voxflowmedia/growth-system?hide_gdpr_banner=1"
+              style={{ minWidth: '320px', width: '100%', height: '700px' }}
             />
           </div>
         </section>
