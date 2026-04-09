@@ -85,6 +85,7 @@ export default function BookACallPage() {
             display: 'grid',
             gap: 32,
             gridTemplateColumns: 'minmax(0, 0.9fr) minmax(0, 1.1fr)',
+            alignItems: 'start',
           }}
         >
           <div
